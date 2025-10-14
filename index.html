@@ -663,6 +663,23 @@
     #deposit-form .form-group {
       margin-bottom: 12px;
     }
+    .required-amount-info {
+      background: #e7f3ff;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center;
+      border: 1px solid #b3d9ff;
+    }
+    .required-amount-info .label {
+      font-size: 14px;
+      color: var(--text-muted-color);
+    }
+    .required-amount-info .amount {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent-color);
+    }
   </style>
   <!-- Monetag SDK Scripts -->
   <script src='//libtl.com/sdk.js' data-zone='9807992' data-sdk='show_9807992'></script>
@@ -944,6 +961,12 @@
         <strong id="deposit-number">01814892156</strong>
         <button id="copy-number-btn" onclick="copyDepositNumber()">Copy</button>
       </div>
+      <!-- Required Amount Info -->
+      <div class="required-amount-info">
+        <div class="label">Required Amount to Deposit:</div>
+        <div class="amount" id="required-amount-bdt">৳0 BDT</div>
+        <div class="label" id="required-amount-usd">$0 USD</div>
+      </div>
       <form id="deposit-form">
         <div class="form-group">
           <label>Your Mobile Number</label>
@@ -955,9 +978,10 @@
         </div>
         <div class="form-group">
           <label>Amount (BDT)</label>
-          <input type="number" id="deposit-amount" class="form-control" placeholder="e.g. 300" min="10" required>
+          <input type="number" id="deposit-amount" class="form-control" placeholder="e.g. 600" min="10" required>
         </div>
         <input type="hidden" id="deposit-package-id">
+        <input type="hidden" id="required-amount">
         <button type="submit" class="action-button primary-button">Submit Request</button>
       </form>
       <div class="modal-actions" style="margin-top: 10px;">
@@ -1051,9 +1075,6 @@
     let currentSelectedPackage = null;
     let userVipSubscriptions = {}; // To store user's active/pending subscriptions
     let vipUpdateInterval = null; // For background updates
-    // --- Updated Balance Logic ---
-    // Dynamic from Firebase: 1000 coins = 30 cents = $0.30 USD
-    // 1 coin = $0.0003 USD (calculated dynamically)
     // --- Core App Logic ---
     function initApp() {
         if (window.Telegram && Telegram.WebApp) {
@@ -2712,6 +2733,16 @@
     document.getElementById('deposit-and-buy-btn').addEventListener('click', () => {
         if (!currentSelectedPackage) return;
         document.getElementById('deposit-package-id').value = currentSelectedPackage.id;
+        document.getElementById('required-amount').value = currentSelectedPackage.price * appConfig.usdToBdtRate;
+        
+        // Update the required amount display
+        const requiredAmountBdt = currentSelectedPackage.price * appConfig.usdToBdtRate;
+        document.getElementById('required-amount-bdt').textContent = `৳${requiredAmountBdt.toFixed(2)} BDT`;
+        document.getElementById('required-amount-usd').textContent = `$${currentSelectedPackage.price.toFixed(2)} USD`;
+        
+        // Set the deposit amount input to the required amount
+        document.getElementById('deposit-amount').value = requiredAmountBdt.toFixed(0);
+        
         closeBuyVipModal();
         document.getElementById('deposit-form-modal').classList.add('active');
     });
@@ -2733,10 +2764,19 @@
         const txnId = document.getElementById('deposit-txn-id').value.trim();
         const amount = parseFloat(document.getElementById('deposit-amount').value);
         const pkgId = document.getElementById('deposit-package-id').value;
+        const requiredAmount = parseFloat(document.getElementById('required-amount').value);
+        
         if (!mobile || !txnId || isNaN(amount) || amount <= 0) {
             showMessageModal('Error', 'Please fill all fields correctly.');
             return;
         }
+        
+        // Check if deposited amount matches the required amount
+        if (Math.abs(amount - requiredAmount) > 1) { // Allow 1 BDT tolerance
+            showMessageModal('Error', `You must deposit exactly ৳${requiredAmount.toFixed(2)} BDT for this package. Please send the correct amount.`);
+            return;
+        }
+        
         try {
             const depositRequest = {
                 userId: tgUser.id,
