@@ -151,12 +151,13 @@
       font-size: 14px;
       display: block;
       margin-top: 3px;
-      color: var(--text-color); /* Changed: Use CSS variable for text color */
+      color: var(--text-color); /* Default text color */
     }
-    .ad-info-box.status-active .value {
+    /* Status text colors only - no background */
+    .status-text-active {
       color: var(--success-color);
     }
-    .ad-info-box.status-inactive .value {
+    .status-text-inactive {
       color: var(--error-color);
     }
     /* --- End Ad Info Section --- */
@@ -1704,13 +1705,15 @@
         const statusValue = document.getElementById('ad-status-value');
         // Show global status if inactive, otherwise show user status
         statusValue.textContent = appConfig.isAdSystemActive ? adStatus : 'Inactive (Global)';
-        // Update status box class for color coding
-        statusBox.classList.remove('status-active', 'status-inactive');
+        
+        // --- UPDATED: Remove background color classes and only apply text color classes ---
+        statusValue.classList.remove('status-text-active', 'status-text-inactive');
         if (appConfig.isAdSystemActive && adStatus === 'Active') {
-            statusBox.classList.add('status-active');
+            statusValue.classList.add('status-text-active');
         } else {
-            statusBox.classList.add('status-inactive');
+            statusValue.classList.add('status-text-inactive');
         }
+        
         // Update reset timer display is handled by the timer function
         // Update balance card background gradient
         const balanceCard = document.querySelector('.balance-card');
