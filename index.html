@@ -114,7 +114,7 @@
     .balance-card .label { 
       font-size: 16px; 
       opacity: 0.9; 
-      color: #000000; /* Black text */
+      color: var(--text-color); /* Changed: Use CSS variable for text color */
       margin-bottom: 5px; 
     }
     .balance-card .balance-value { 
@@ -122,12 +122,12 @@
       font-weight: 800; 
       margin: 0; 
       letter-spacing: 1px; 
-      color: #000000; /* Black text */
+      color: var(--text-color); /* Changed: Use CSS variable for text color */
     }
     .balance-card .points-value { 
       font-size: 16px; 
       font-weight: 600; 
-      color: #000000; /* Black text */
+      color: var(--text-color); /* Changed: Use CSS variable for text color */
       margin-top: 10px; 
     }
     
@@ -140,21 +140,18 @@
     }
     .ad-info-box {
       flex: 1;
-      background: rgba(0, 0, 0, 0.05); /* Very light grey background */
+      background: transparent; /* Changed: Remove background completely */
       border-radius: 10px;
       padding: 10px;
       text-align: center;
       font-size: 12px;
-    }
-    body.dark-mode .ad-info-box {
-      background: rgba(255, 255, 255, 0.05); /* Very light background in dark mode */
     }
     .ad-info-box .value {
       font-weight: bold;
       font-size: 14px;
       display: block;
       margin-top: 3px;
-      color: #000000; /* Black text */
+      color: var(--text-color); /* Changed: Use CSS variable for text color */
     }
     .ad-info-box.status-active .value {
       color: var(--success-color);
