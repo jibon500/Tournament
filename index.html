@@ -9,7 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <style>
-    /* ... (সম্পূর্ণ আগের CSS অপরিবর্তিত রাখা হয়েছে) ... */
     :root {
       /* -- Updated all colors to white theme -- */
       --primary-color: #2ed914; /* Keep green for accents */
@@ -102,15 +101,36 @@
     .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .user-info .username { font-size: 18px; font-weight: 700; margin: 0; }
     .user-info .title { font-size: 14px; color: var(--text-muted-color); margin: 0; }
+    
+    /* BALANCE CARD - NO BACKGROUND, ONLY BORDER AND ROUNDED CORNERS */
     .balance-card {
-      /* ব্যাকগ্রাউন্ড কালার রিমুভ করা হয়েছে */
-      border-radius: 16px; padding: 20px;
-      text-align: center; margin-bottom: 25px;
-      background: transparent !important; /* ব্যাকগ্রাউন্ড ট্রান্সপারেন্ট করা হয়েছে */
+      background: transparent; /* No background */
+      border-radius: 16px; 
+      padding: 20px;
+      text-align: center; 
+      margin-bottom: 25px;
+      border: 1px solid var(--border-color); /* Keep border for visibility */
     }
-    .balance-card .label { font-size: 16px; opacity: 0.9; color: var(--text-color); margin-bottom: 5px; } /* কালার var(--text-color) করা হয়েছে */
-    .balance-card .balance-value { font-size: 36px; font-weight: 800; margin: 0; letter-spacing: 1px; color: var(--text-color); } /* কালার var(--text-color) করা হয়েছে */
-    .balance-card .points-value { font-size: 16px; font-weight: 600; color: var(--text-color); margin-top: 10px; } /* কালার var(--text-color) করা হয়েছে */
+    .balance-card .label { 
+      font-size: 16px; 
+      opacity: 0.9; 
+      color: #000000; /* Black text */
+      margin-bottom: 5px; 
+    }
+    .balance-card .balance-value { 
+      font-size: 36px; 
+      font-weight: 800; 
+      margin: 0; 
+      letter-spacing: 1px; 
+      color: #000000; /* Black text */
+    }
+    .balance-card .points-value { 
+      font-size: 16px; 
+      font-weight: 600; 
+      color: #000000; /* Black text */
+      margin-top: 10px; 
+    }
+    
     /* --- New Ad Info Section --- */
     .ad-info-section {
       display: flex;
@@ -120,20 +140,21 @@
     }
     .ad-info-box {
       flex: 1;
-      background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+      background: rgba(0, 0, 0, 0.05); /* Very light grey background */
       border-radius: 10px;
       padding: 10px;
       text-align: center;
       font-size: 12px;
     }
     body.dark-mode .ad-info-box {
-      background: rgba(0, 0, 0, 0.2); /* Semi-transparent black in dark mode */
+      background: rgba(255, 255, 255, 0.05); /* Very light background in dark mode */
     }
     .ad-info-box .value {
       font-weight: bold;
       font-size: 14px;
       display: block;
       margin-top: 3px;
+      color: #000000; /* Black text */
     }
     .ad-info-box.status-active .value {
       color: var(--success-color);
@@ -142,6 +163,7 @@
       color: var(--error-color);
     }
     /* --- End Ad Info Section --- */
+    
     .section-title { font-size: 20px; font-weight: 700; margin-bottom: 15px; padding-left: 5px; border-left: 4px solid var(--primary-color); }
     .task-card {
       background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px;
