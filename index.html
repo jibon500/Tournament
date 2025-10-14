@@ -140,11 +140,12 @@
     }
     .ad-info-box {
       flex: 1;
-      background: transparent; /* Changed: Remove background completely */
+      background: transparent; /* Remove background completely */
       border-radius: 10px;
       padding: 10px;
       text-align: center;
       font-size: 12px;
+      border: 1px solid var(--border-color); /* Keep border like balance card */
     }
     .ad-info-box .value {
       font-weight: bold;
@@ -1706,7 +1707,7 @@
         // Show global status if inactive, otherwise show user status
         statusValue.textContent = appConfig.isAdSystemActive ? adStatus : 'Inactive (Global)';
         
-        // --- UPDATED: Remove background color classes and only apply text color classes ---
+        // --- UPDATED: Apply text color classes correctly ---
         statusValue.classList.remove('status-text-active', 'status-text-inactive');
         if (appConfig.isAdSystemActive && adStatus === 'Active') {
             statusValue.classList.add('status-text-active');
