@@ -1,2970 +1,517 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>TKBD5_bot</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-  <style>
-    :root {
-      /* -- Updated all colors to white theme -- */
-      --primary-color: #2ed914; /* Keep green for accents */
-      --primary-hover: #3bff21;
-      --secondary-color: #e0e0e0; /* Light grey instead of dark */
-      --background-color: #ffffff; /* White background */
-      --text-color: #000000; /* Black text */
-      --text-muted-color: #666666; /* Dark grey for muted text */
-      --accent-color: #ff8c00; /* Orange for accents */
-      --card-bg: #f5f5f5; /* Light grey card background */
-      --error-color: #ff4444; /* Error color */
-      --pending-color: #ffc107; /* Yellow for pending */
-      --processing-color: #17a2b8; /* Blue for processing */
-      --success-color: #28a745; /* Green for success */
-      --rejected-color: #dc3545; /* Red for rejected */
-      --requesting-color: #dc3545; /* Red for requesting state */
-      /* Dark mode variables */
-      --dm-primary-color: #4CAF50;
-      --dm-primary-hover: #66BB6A;
-      --dm-secondary-color: #424242;
-      --dm-background-color: #121212;
-      --dm-text-color: #FFFFFF;
-      --dm-text-muted-color: #BDBDBD;
-      --dm-accent-color: #FFA726;
-      --dm-card-bg: #1E1E1E;
-      --dm-error-color: #EF5350;
-      --dm-border-color: rgba(255, 255, 255, 0.1);
-    }
-    /* Light mode (default) */
-    body.light-mode {
-      --primary-color: #2ed914;
-      --primary-hover: #3bff21;
-      --secondary-color: #e0e0e0;
-      --background-color: #ffffff;
-      --text-color: #000000;
-      --text-muted-color: #666666;
-      --accent-color: #ff8c00;
-      --card-bg: #f5f5f5;
-      --error-color: #ff4444;
-      --pending-color: #ffc107;
-      --processing-color: #17a2b8;
-      --success-color: #28a745;
-      --rejected-color: #dc3545;
-      --requesting-color: #dc3545;
-      --border-color: rgba(0, 0, 0, 0.1);
-    }
-    /* Dark mode */
-    body.dark-mode {
-      --primary-color: var(--dm-primary-color);
-      --primary-hover: var(--dm-primary-hover);
-      --secondary-color: var(--dm-secondary-color);
-      --background-color: var(--dm-background-color);
-      --text-color: var(--dm-text-color);
-      --text-muted-color: var(--dm-text-muted-color);
-      --accent-color: var(--dm-accent-color);
-      --card-bg: var(--dm-card-bg);
-      --error-color: var(--dm-error-color);
-      --pending-color: #FFD54F;
-      --processing-color: #4FC3F7;
-      --success-color: #66BB6A;
-      --rejected-color: #EF5350;
-      --requesting-color: #EF5350;
-      --border-color: var(--dm-border-color);
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      margin: 0; padding: 0; background-color: var(--background-color); color: var(--text-color);
-      font-family: 'Segoe UI', 'Roboto', sans-serif; display: flex; justify-content: center; align-items: center;
-      height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    }
-    .container {
-      width: 100%; height: 100%; max-width: 400px; background: var(--background-color);
-      display: flex; flex-direction: column; overflow: hidden; position: relative;
-    }
-    main {
-      flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; /* Space for footer nav */
-    }
-    .view { display: none; animation: fadeIn 0.4s ease-in-out; }
-    .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .user-header-card {
-      background: var(--card-bg); border-radius: 16px; padding: 15px; margin-bottom: 25px;
-      display: flex; align-items: center; border: 1px solid var(--border-color);
-    }
-    .user-avatar {
-      width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; overflow: hidden;
-      background: linear-gradient(135deg, var(--primary-color), #00a651);
-      display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;
-    }
-    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .user-info .username { font-size: 18px; font-weight: 700; margin: 0; }
-    .user-info .title { font-size: 14px; color: var(--text-muted-color); margin: 0; }
-    
-    /* BALANCE CARD - NO BACKGROUND, ONLY BORDER AND ROUNDED CORNERS */
-    .balance-card {
-      background: transparent; /* No background */
-      border-radius: 16px; 
-      padding: 20px;
-      text-align: center; 
-      margin-bottom: 25px;
-      border: 1px solid var(--border-color); /* Keep border for visibility */
-    }
-    .balance-card .label { 
-      font-size: 16px; 
-      opacity: 0.9; 
-      color: var(--text-color); /* Changed: Use CSS variable for text color */
-      margin-bottom: 5px; 
-    }
-    .balance-card .balance-value { 
-      font-size: 36px; 
-      font-weight: 800; 
-      margin: 0; 
-      letter-spacing: 1px; 
-      color: var(--text-color); /* Changed: Use CSS variable for text color */
-    }
-    .balance-card .points-value { 
-      font-size: 16px; 
-      font-weight: 600; 
-      color: var(--text-color); /* Changed: Use CSS variable for text color */
-      margin-top: 10px; 
-    }
-    
-    /* --- New Ad Info Section --- */
-    .ad-info-section {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .ad-info-box {
-      flex: 1;
-      background: transparent; /* Remove background completely */
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-      font-size: 12px;
-      border: 1px solid var(--border-color); /* Keep border like balance card */
-    }
-    .ad-info-box .value {
-      font-weight: bold;
-      font-size: 14px;
-      display: block;
-      margin-top: 3px;
-      color: var(--text-color); /* Default text color */
-    }
-    /* Status text colors only - no background */
-    .status-text-active {
-      color: var(--success-color);
-    }
-    .status-text-inactive {
-      color: var(--error-color);
-    }
-    /* --- End Ad Info Section --- */
-    
-    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 15px; padding-left: 5px; border-left: 4px solid var(--primary-color); }
-    .task-card {
-      background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px;
-      display: flex; align-items: center; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;
-      border: 1px solid var(--border-color);
-    }
-    .task-card:hover { transform: translateY(-3px); background-color: var(--secondary-color); }
-    .task-icon { font-size: 24px; color: var(--primary-color); margin-right: 20px; width: 30px; text-align: center; }
-    .task-details h3 { margin: 0; font-size: 16px; font-weight: 600; }
-    .task-details p { margin: 3px 0 0; font-size: 13px; color: var(--text-muted-color); }
-    .task-arrow { margin-left: auto; font-size: 18px; color: var(--text-muted-color); }
-    .list-item {
-      display: flex; align-items: center; background: var(--card-bg); padding: 12px 15px;
-      border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);
-    }
-    .list-item .rank { font-size: 16px; font-weight: 700; color: var(--text-muted-color); width: 30px; }
-    .list-item .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--secondary-color); margin-right: 15px; object-fit: cover; }
-    .list-item .info { flex-grow: 1; }
-    .list-item .info .name { font-weight: 600; font-size: 15px; }
-    .list-item .info .detail { font-size: 13px; color: var(--text-muted-color); }
-    .list-item .score { font-size: 16px; font-weight: 700; color: var(--accent-color); }
-    .history-icon { color: var(--primary-color); margin-right: 15px; font-size: 18px; }
-    .footer-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 400px; margin: 0 auto;
-      display: flex; justify-content: space-around; background: var(--secondary-color);
-      padding: 10px 0; border-top: 1px solid var(--border-color);
-    }
-    .nav-button {
-      display: flex; flex-direction: column; align-items: center; color: var(--text-muted-color);
-      background: none; border: none; font-size: 12px; transition: color 0.2s ease, transform 0.2s ease;
-      cursor: pointer; padding: 5px 10px;
-    }
-    .nav-button .icon { font-size: 22px; margin-bottom: 4px; }
-    .nav-button:hover { color: var(--text-color); }
-    .nav-button.active { color: var(--primary-color); transform: scale(1.1); }
-    .action-button {
-      width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700;
-      margin-top: 15px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
-    .primary-button { background: var(--primary-color); color: #000; }
-    .primary-button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 217, 20, 0.3); }
-    .secondary-button { background: var(--secondary-color); color: var(--primary-color); border: 1px solid var(--border-color); }
-    .secondary-button:hover { background: #d0d0d0; }
-    .requesting-button { background: var(--requesting-color); color: #fff; }
-    .requesting-button:hover { background: #c82333; }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
-      display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s;
-    }
-    .modal-overlay.active { display: flex; }
-    .modal-content {
-      background: var(--card-bg); padding: 25px; border-radius: 16px; width: 90%; max-width: 320px;
-      text-align: center; animation: slideIn 0.3s; border: 1px solid var(--border-color);
-    }
-    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .modal-content h3 { margin-top: 0; font-size: 20px; }
-    .modal-content p { color: var(--text-muted-color); margin-bottom: 25px; }
-    .modal-actions { display: flex; gap: 10px; }
-    /* Withdraw Modal Specific Styles */
-    .withdraw-form {
-      text-align: left;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      background: var(--card-bg);
-      color: var(--text-color);
-    }
-    .status-pending { color: var(--pending-color); font-weight: bold; }
-    .status-processing { color: var(--processing-color); font-weight: bold; }
-    .status-success { color: var(--success-color); font-weight: bold; }
-    .status-rejected { color: var(--rejected-color); font-weight: bold; }
-    /* Loading and Error States */
-    .loading, .error-message {
-      text-align: center;
-      padding: 20px;
-      font-size: 16px;
-    }
-    .error-message {
-      color: var(--error-color);
-      font-weight: bold;
-    }
-    .hidden { display: none; }
-    /* Disabled state for UI elements */
-    .disabled {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-    /* Withdraw History Modal */
-    #withdraw-history-modal .modal-content {
-        width: 95%;
-        max-width: 400px;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-    #withdraw-history-modal-list {
-        text-align: left;
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-    /* Share Modal */
-    #share-modal .modal-content {
-        width: 95%;
-        max-width: 400px;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-    #referral-link {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 14px;
-        margin-bottom: 15px;
-        background-color: var(--card-bg);
-        color: var(--text-color);
-    }
-    .referral-stats {
-        display: flex;
-        justify-content: space-around;
-        margin: 20px 0;
-        text-align: center;
-    }
-    .referral-stat-item {
-        background: var(--card-bg);
-        padding: 15px;
-        border-radius: 12px;
-        flex: 1;
-        margin: 0 5px;
-        border: 1px solid var(--border-color);
-    }
-    .referral-stat-value {
-        font-size: 24px;
-        font-weight: bold;
-        color: var(--primary-color);
-    }
-    .referral-stat-label {
-        font-size: 14px;
-        color: var(--text-muted-color);
-    }
-    /* --- New CSS for hiding footer on blocked view --- */
-    .hide-footer {
-        display: none !important;
-    }
-    /* Dark/Light Mode Toggle */
-    .theme-toggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1001;
-      background: rgba(0, 0, 0, 0.1);
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--text-color);
-      transition: all 0.3s ease;
-    }
-    .theme-toggle:hover {
-      background: rgba(0, 0, 0, 0.2);
-      transform: scale(1.1);
-    }
-    body.dark-mode .theme-toggle {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-color);
-    }
-    body.dark-mode .theme-toggle:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    /* Notification Button */
-    .notification-toggle {
-      position: fixed;
-      top: 10px;
-      right: 50px; /* Positioned to the left of theme toggle */
-      z-index: 1001;
-      background: rgba(0, 0, 0, 0.1);
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--text-color);
-      transition: all 0.3s ease;
-    }
-    .notification-toggle:hover {
-      background: rgba(0, 0, 0, 0.2);
-      transform: scale(1.1);
-    }
-    body.dark-mode .notification-toggle {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-color);
-    }
-    body.dark-mode .notification-toggle:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    /* Notification Modal */
-    #notification-modal .modal-content {
-        width: 95%;
-        max-width: 400px;
-        max-height: 80vh;
-        overflow-y: auto;
-        text-align: left;
-    }
-    #notification-modal-list {
-        margin-bottom: 20px;
-    }
-    .notification-item {
-        background: var(--card-bg);
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        border: 1px solid var(--border-color);
-    }
-    .notification-item h4 {
-        margin: 0 0 5px 0;
-        font-size: 16px;
-    }
-    .notification-item p {
-        margin: 0 0 5px 0;
-        font-size: 14px;
-        color: var(--text-muted-color);
-    }
-    .notification-item small {
-        color: var(--text-muted-color);
-        font-size: 12px;
-    }
-    .notification-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .notification-actions button {
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        border: none;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-align: center;
-    }
-    .admin-support-btn {
-        background: var(--primary-color);
-        color: #000;
-    }
-    .admin-support-btn:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
-    }
-    .important-notices-btn {
-        background: var(--accent-color);
-        color: #fff;
-    }
-    .important-notices-btn:hover {
-        background: #ff9800; /* Slightly lighter orange on hover */
-        transform: translateY(-2px);
-    }
-    /* --- Admin Message Modal - Updated for larger size and message alignment --- */
-    #admin-message-modal .modal-content {
-        width: 90%; /* Increased width */
-        max-width: 90%; /* Increased max-width */
-        max-height: 90vh; /* Increased max-height */
-        overflow-y: auto;
-        text-align: left;
-        padding: 20px; /* Adjusted padding */
-    }
-    #admin-message-history {
-        /* --- Update: Increased min-height and added flexbox for better layout --- */
-        min-height: 300px; /* বড় করা হয়েছে */
-        max-height: 60vh; /* Increased max-height for message history */
-        overflow-y: auto;
-        margin-bottom: 15px;
-        padding: 10px;
-        background: var(--background-color);
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        display: flex; /* ফ্লেক্সবক্স লেআউট */
-        flex-direction: column; /* কলাম অর্ডার */
-        /* --- End Update --- */
-    }
-    .message-bubble {
-        padding: 12px 18px; /* Increased padding */
-        border-radius: 20px; /* Increased border-radius */
-        margin-bottom: 12px; /* Increased margin */
-        max-width: 85%; /* Slightly increased max-width */
-        word-wrap: break-word;
-        font-size: 15px; /* Increased font size */
-        /* --- Update: Removed default margin alignment --- */
-        /* margin-left: auto; */
-        /* margin-right: auto; */
-        /* --- End Update --- */
-    }
-    .user-message {
-        background-color: var(--primary-color);
-        color: #000;
-        /* --- Update: Float right for user messages --- */
-        margin-left: auto; /* ডানে সারিবদ্ধ */
-        /* --- End Update --- */
-    }
-    .admin-message {
-        background-color: var(--secondary-color);
-        color: var(--text-color);
-        /* --- Update: Float left for admin messages --- */
-        margin-right: auto; /* বামে সারিবদ্ধ */
-        /* --- End Update --- */
-    }
-    #admin-message-input {
-        width: calc(100% - 70px); /* Adjust for larger button width */
-        padding: 12px; /* Increased padding */
-        border: 1px solid #ccc;
-        border-radius: 10px; /* Increased border-radius */
-        font-size: 16px;
-        margin-right: 12px; /* Increased margin */
-        background-color: var(--card-bg);
-        color: var(--text-color);
-    }
-    #send-admin-message {
-        width: 60px; /* Increased width */
-        padding: 12px; /* Increased padding */
-        border-radius: 10px; /* Increased border-radius */
-        border: none;
-        background: var(--primary-color);
-        color: #000;
-        font-weight: bold;
-        font-size: 16px; /* Increased font size */
-        cursor: pointer;
-    }
-    #send-admin-message:hover {
-        background: var(--primary-hover);
-    }
-    /* --- Important Notices Modal - Updated for larger size --- */
-    #important-notices-modal .modal-content {
-        width: 90%; /* Increased width */
-        max-width: 90%; /* Increased max-width */
-        max-height: 90vh; /* Increased max-height */
-        overflow-y: auto;
-        text-align: left;
-        padding: 20px; /* Adjusted padding */
-    }
-    #important-notices-list {
-        max-height: 70vh; /* Increased max-height for notices */
-        overflow-y: auto;
-    }
-    /* Ensure notification modal list items are styled consistently */
-    #important-notices-list .notification-item {
-        background: var(--card-bg);
-        padding: 18px; /* Increased padding */
-        border-radius: 12px; /* Increased border-radius */
-        margin-bottom: 15px; /* Increased margin */
-        border: 1px solid var(--border-color);
-    }
-    #important-notices-list .notification-item h4 {
-        margin: 0 0 8px 0; /* Increased margin */
-        font-size: 18px; /* Increased font size */
-    }
-    #important-notices-list .notification-item p {
-        margin: 0 0 8px 0; /* Increased margin */
-        font-size: 16px; /* Increased font size */
-        color: var(--text-muted-color);
-    }
-    #important-notices-list .notification-item small {
-        color: var(--text-muted-color);
-        font-size: 14px; /* Increased font size */
-    }
-    /* === NEW: VIP Package Styles === */
-    .vip-package-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      border: 1px solid var(--border-color);
-      position: relative;
-    }
-    .vip-package-card.inactive {
-      opacity: 0.6;
-    }
-    .vip-package-card .package-name {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 10px 0;
-      color: var(--primary-color);
-    }
-    .vip-package-card .package-detail {
-      font-size: 14px;
-      margin: 3px 0;
-      color: var(--text-muted-color);
-    }
-    .vip-package-card .package-price {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-    .vip-package-card .package-price-usd {
-      color: var(--accent-color);
-    }
-    .vip-package-card .package-price-bdt {
-      color: var(--text-muted-color);
-      font-size: 14px;
-    }
-    .vip-package-card .buy-button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: var(--primary-color);
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .vip-package-card .buy-button:hover {
-      background: var(--primary-hover);
-    }
-    .vip-package-card .buy-button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .vip-package-card .watch-button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: var(--success-color);
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .vip-package-card .watch-button:hover {
-      background: #218838; /* Slightly darker green */
-    }
-    .vip-package-card .status-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .status-pending {
-      background-color: var(--pending-color);
-      color: #000;
-    }
-    .status-active {
-      background-color: var(--success-color);
-      color: #fff;
-    }
-    .status-inactive {
-      background-color: var(--error-color);
-      color: #fff;
-    }
-    /* === NEW: Deposit Form Modal === */
-    #deposit-form-modal .modal-content {
-      width: 95%;
-      max-width: 400px;
-      text-align: left;
-    }
-    #deposit-instructions {
-      background: #f8f9fa;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      color: var(--text-color);
-    }
-    #copy-number-btn {
-      margin-left: 8px;
-      padding: 4px 8px;
-      font-size: 12px;
-      background: var(--primary-color);
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #deposit-form .form-group {
-      margin-bottom: 12px;
-    }
-    .required-amount-info {
-      background: #e7f3ff;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      text-align: center;
-      border: 1px solid #b3d9ff;
-    }
-    .required-amount-info .label {
-      font-size: 14px;
-      color: var(--text-muted-color);
-    }
-    .required-amount-info .amount {
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--accent-color);
-    }
-  </style>
-  <!-- Monetag SDK Scripts -->
-  <script src='//libtl.com/sdk.js' data-zone='9807992' data-sdk='show_9807992'></script>
-  <script src='//libtl.com/sdk.js' data-zone='9702109' data-sdk='show_9702109'></script>
-  <script src='//libtl.com/sdk.js' data-zone='9292001' data-sdk='show_9292001'></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Security Alert</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#040407;--red:#ff0808;--rg:rgba(255,8,8,.45);--cyan:#00e5ff;--gold:#ffa000;--w:#f0f0f0;--g:#777;--dc:rgba(12,12,22,.9);--bd:rgba(255,8,8,.2)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--w);font-family:'Share Tech Mono',monospace;touch-action:none}
+#trap{position:fixed;inset:0;z-index:2147483645;background:var(--bg);display:none}
+#trap.on{display:block}
+#ls{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none}
+#ls::-webkit-scrollbar{display:none}
+#ls::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,8,8,.06)0%,transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(0,229,255,.02)0%,transparent 50%);pointer-events:none;z-index:0}
+.scl{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1)2px,rgba(0,0,0,.1)4px);pointer-events:none;z-index:2;animation:sm 8s linear infinite}
+@keyframes sm{to{transform:translateY(4px)}}
+.sbar{position:fixed;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 20px var(--cyan),0 0 60px var(--cyan);z-index:3;animation:sb 3s ease-in-out infinite;pointer-events:none}
+@keyframes sb{0%,100%{top:5%;opacity:0}10%{opacity:1}90%{opacity:1}50%{top:92%}}
+.rfl{position:fixed;inset:0;background:radial-gradient(circle,rgba(255,8,8,.15),transparent 70%);pointer-events:none;z-index:100;opacity:0;transition:opacity .12s}
+.rfl.on{opacity:1}
+.vig{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7)100%);pointer-events:none;z-index:1}
+.lc{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:13px;padding:28px 16px 50px;width:100%;max-width:440px}
+.lw{position:relative;width:92px;height:92px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lw .rn{position:absolute;width:100%;height:100%;border:2px solid var(--red);border-radius:50%;animation:rp 2s ease-in-out infinite}
+.lw .rn:nth-child(2){width:116%;height:116%;animation-delay:.5s;border-color:rgba(255,8,8,.25)}
+.lw .rn:nth-child(3){width:132%;height:132%;animation-delay:1s;border-color:rgba(255,8,8,.08)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.4}}
+.lw i{font-size:40px;color:var(--red);filter:drop-shadow(0 0 20px var(--rg));animation:lb 2s ease-in-out infinite}
+@keyframes lb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.tt{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:4px;text-shadow:0 0 30px var(--rg),0 0 80px rgba(255,8,8,.15);animation:tf 4s ease-in-out infinite;text-align:center}
+@keyframes tf{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.3}94%{opacity:1}96%{opacity:.5}97%{opacity:1}}
+.tr{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--g)}
+.tr i{color:var(--red);font-size:12px}.tr .tv{color:var(--w);font-weight:700}
+.wb{width:100%;background:linear-gradient(135deg,rgba(255,8,8,.08),rgba(255,8,8,.02));border:1px solid var(--bd);border-left:3px solid var(--red);border-radius:8px;padding:11px 13px;position:relative;overflow:hidden}
+.wb::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,8,8,.04),transparent);animation:ws 3s ease-in-out infinite}
+@keyframes ws{to{left:150%}}
+.wb p{font-size:10.5px;line-height:1.6;color:#bbb;position:relative;z-index:1}
+.wb p strong{color:var(--red)}
+.di{width:100%;background:var(--dc);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:5px}
+.di .dr{display:flex;justify-content:space-between;font-size:9.5px}
+.di .dr .dl{color:var(--g)}.di .dr .dv{color:var(--cyan)}
+.pc{width:100%;background:linear-gradient(135deg,rgba(255,160,0,.08),rgba(255,160,0,.02));border:1px solid rgba(255,160,0,.25);border-radius:12px;padding:16px;text-align:center;box-shadow:0 0 40px rgba(255,160,0,.04),inset 0 0 40px rgba(255,160,0,.015);animation:pg 2.5s ease-in-out infinite;position:relative;overflow:hidden}
+@keyframes pg{0%,100%{box-shadow:0 0 40px rgba(255,160,0,.04),inset 0 0 40px rgba(255,160,0,.015)}50%{box-shadow:0 0 60px rgba(255,160,0,.12),inset 0 0 50px rgba(255,160,0,.04)}}
+.pc .ph{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}
+.pc .ph i{font-size:15px}
+.pn{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--gold);letter-spacing:3px;margin:6px 0;text-shadow:0 0 20px rgba(255,160,0,.25)}
+.plb{font-size:10px;color:rgba(255,160,0,.6);margin-bottom:8px;letter-spacing:.5px}
+.cb{background:rgba(255,160,0,.12);border:1px solid rgba(255,160,0,.25);border-radius:8px;color:var(--gold);padding:8px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:6px}
+.cb:active{transform:scale(.96);background:rgba(255,160,0,.2)}
+.pdv{width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,160,0,.2),transparent);margin:8px auto}
+.pnt{font-size:8.5px;color:#444;margin-top:8px;line-height:1.5}
+.sp{width:100%;display:flex;flex-direction:column;gap:4px}
+.sp .sr{display:flex;justify-content:space-between;font-size:9.5px}
+.sp .sr .sl{color:var(--g)}.sp .sr .spv{color:var(--cyan)}
+.pt{width:100%;height:3px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden}
+.pf{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--red));border-radius:3px;transition:width .5s;box-shadow:0 0 8px var(--cyan)}
+.tl{width:100%;display:flex;flex-direction:column;gap:4px}
+.ti{display:flex;align-items:center;gap:7px;font-size:9.5px;padding:6px 9px;background:rgba(255,8,8,.04);border-radius:5px;border:1px solid rgba(255,8,8,.07);animation:tin .5s ease-out both}
+.ti i{color:var(--red);font-size:11px;flex-shrink:0}
+.ti .tt{color:#aaa;flex:1}
+.ti .ts{color:var(--red);font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
+@keyframes tin{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.br{display:flex;align-items:center;gap:7px;margin-top:2px}
+.br .ab{background:linear-gradient(135deg,var(--cyan),#0088aa);color:#000;font-size:7.5px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;font-family:'Orbitron',sans-serif}
+.br .bt{color:var(--g);font-size:8.5px;letter-spacing:1px}
+.fub{width:100%;padding:12px;background:linear-gradient(135deg,rgba(255,8,8,.1),rgba(255,8,8,.03));border:1px solid var(--bd);border-radius:10px;color:var(--red);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;text-align:center}
+.fub:active{background:rgba(255,8,8,.15);transform:scale(.98)}
+.toast{position:fixed;bottom:45px;left:50%;transform:translateX(-50%) translateY(80px);padding:9px 20px;border-radius:8px;font-size:10.5px;font-weight:700;z-index:2147483647;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ft{background:rgba(255,8,8,.95);color:#fff;box-shadow:0 4px 30px rgba(255,8,8,.5)}
+.ct{background:rgba(255,160,0,.95);color:#000;box-shadow:0 4px 30px rgba(255,160,0,.4)}
+#unl{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2147483647;gap:18px}
+#unl .ui{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#00c853,#00e676);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(0,200,83,.4);animation:up .6s ease-out}
+@keyframes up{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+#unl .ui i{font-size:44px;color:#fff}
+#unl h2{font-family:'Orbitron',sans-serif;font-size:20px;color:#00e676;letter-spacing:3px}
+#unl p{color:var(--g);font-size:11px}
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
+@media(max-width:370px){.tt{font-size:19px;letter-spacing:2px}.lw{width:76px;height:76px}.lw i{font-size:34px}.pn{font-size:20px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
 </head>
-<body class="light-mode">
-  <!-- Notification Toggle Button -->
-  <button class="notification-toggle" id="notificationToggle" title="Notifications">
-    <i class="fas fa-bell"></i>
-  </button>
-  <!-- Theme Toggle Button -->
-  <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-    <i class="fas fa-moon"></i>
-  </button>
-  <div class="container">
-    <main id="main-content">
-      <!-- HOME VIEW -->
-      <div id="home-view" class="view active">
-        <div class="user-header-card">
-          <div class="user-avatar" id="profile-pic">EE</div>
-          <div class="user-info">
-            <h2 class="username" id="username">Loading...</h2>
-            <p class="title">Welcome Back!</p>
-          </div>
-        </div>
-        <div class="balance-card">
-            <p class="label">Total Balance</p>
-            <h1 class="balance-value" id="balance-value">$0.00</h1>
-            <p class="points-value"><i class="fa-solid fa-coins"></i> <span id="points-value">0</span> Coins</p>
-            <!-- Ad Info Section - Placed between Coins and Section Title -->
-            <div class="ad-info-section">
-                <div class="ad-info-box">
-                    <span>Daily Limit</span>
-                    <span class="value" id="daily-ad-limit">0/0</span>
-                </div>
-                <div class="ad-info-box" id="ad-status-box">
-                    <span>Status</span>
-                    <span class="value" id="ad-status-value">Loading...</span>
-                </div>
-                <div class="ad-info-box">
-                    <span>Reset In</span>
-                    <span class="value" id="reset-timer">--:--:--</span>
-                </div>
-            </div>
-            <!-- End Ad Info Section -->
-        </div>
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="task-card" onclick="showView('tasks-view')">
-            <div class="task-icon"><i class="fa-solid fa-list-check"></i></div>
-            <div class="task-details"><h3>View Tasks</h3><p>Watch ads and complete tasks to earn coins.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-        <div class="task-card" onclick="showView('withdraw-view')">
-            <div class="task-icon"><i class="fa-solid fa-wallet"></i></div>
-            <div class="task-details"><h3>Withdraw Funds</h3><p>Request to withdraw your available balance.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-        <!-- === NEW: VIP Package Card on Home === -->
-        <div class="task-card" onclick="showView('vip-packages-view')">
-            <div class="task-icon"><i class="fa-solid fa-crown"></i></div>
-            <div class="task-details"><h3>VIP Package</h3><p>Unlock premium earning power with VIP.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-      </div>
-      <!-- === NEW: VIP PACKAGES VIEW === -->
-      <div id="vip-packages-view" class="view">
-        <h2 class="section-title">VIP Packages</h2>
-        <div id="vip-packages-list">
-          <!-- Packages loaded from Firebase -->
-          <div class="loading">Loading VIP packages...</div>
-        </div>
-      </div>
-      <!-- TASKS VIEW -->
-      <div id="tasks-view" class="view">
-        <h2 class="section-title">Earning Tasks</h2>
-        <!-- Original "Tap to Earn" Button -->
-        <div class="task-card" onclick="showAd()">
-            <div class="task-icon"><i class="fa-solid fa-hand-pointer"></i></div>
-            <div class="task-details"><h3>Tap to Earn</h3><p>Tap the button to watch an ad and earn 10 coins.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
-        </div>
-        <!-- New "Tap to Earn One" Button -->
-        <div class="task-card" onclick="showAdOne()">
-            <div class="task-icon"><i class="fa-solid fa-hand-pointer"></i></div>
-            <div class="task-details"><h3>Tap to Earn One</h3><p>Tap the button to watch an ad and earn 10 coins.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
-        </div>
-        <!-- New "Tap to Earn Two" Button -->
-        <div class="task-card" onclick="showAdTwo()">
-            <div class="task-icon"><i class="fa-solid fa-hand-pointer"></i></div>
-            <div class="task-details"><h3>Tap to Earn Two</h3><p>Tap the button to watch an ad and earn 10 coins.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
-        </div>
-        <!-- New "Unlimited Ads" Button -->
-        <div class="task-card" onclick="showUnlimitedAd()">
-            <div class="task-icon"><i class="fa-solid fa-infinity"></i></div> <!-- Optional: Different icon -->
-            <div class="task-details"><h3>Unlimited Ads</h3><p>Click to watch ads from One Click Ad.</p></div>
-            <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
-        </div>
-      </div>
-      <!-- WITHDRAW VIEW -->
-      <div id="withdraw-view" class="view">
-        <h2 class="section-title">Withdraw Funds</h2>
-        <!-- Withdraw Form -->
-        <div class="withdraw-form">
-          <div class="form-group">
-            <label for="paymentMethod">Payment Method</label>
-            <select id="paymentMethod" class="form-control">
-              <option value="bkash">Bkash</option>
-              <option value="nagad">Nagad</option>
-              <option value="rocket">Rocket</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="mobileNumber">Mobile Number</label>
-            <input type="tel" id="mobileNumber" class="form-control" placeholder="Enter mobile number">
-          </div>
-          <div class="form-group">
-            <label for="withdrawAmount">Amount ($)</label>
-            <input type="number" id="withdrawAmount" class="form-control" placeholder="Enter amount" step="0.01" min="5">
-          </div>
-          <button id="requestWithdrawBtn" class="action-button primary-button" onclick="requestWithdraw()">
-            <i class="fa-solid fa-paper-plane"></i> Request Withdrawal
-          </button>
-        </div>
-        <!-- Withdraw History Button -->
-        <button class="action-button secondary-button" onclick="openWithdrawHistoryModal()" style="margin-top: 20px;">
-          <i class="fa-solid fa-history"></i> View Withdraw History
-        </button>
-      </div>
-      <!-- HISTORY VIEW -->
-      <div id="history-view" class="view">
-        <h2 class="section-title">Recent Activity</h2>
-        <div id="history-list"><!-- History items will be generated here by JS --></div>
-      </div>
-      <!-- BLOCKED VIEW -->
-      <div id="blocked-view" class="view">
-        <div class="error-message">
-          <h2><i class="fa-solid fa-ban"></i> Account Blocked</h2>
-          <p>Your account has been blocked. Please contact admin to unblock.</p>
-          <!-- Telegram Contact Button (Special class to avoid disableUI) -->
-          <a href="https://t.me/Nikhil_Shaan" target="_blank" rel="noopener noreferrer" class="action-button primary-button telegram-button" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-top: 20px;">
-            <i class="fa-brands fa-telegram" style="margin-right: 8px;"></i> Contact Admin on Telegram
-          </a>
-        </div>
-      </div>
-    </main>
-    <nav class="footer-nav">
-      <button class="nav-button active" onclick="showView('home-view')"><i class="icon fa-solid fa-house"></i>Home</button>
-      <button class="nav-button" onclick="showView('tasks-view')"><i class="icon fa-solid fa-list-check"></i>Tasks</button>
-      <button class="nav-button" onclick="showView('history-view')"><i class="icon fa-solid fa-clock-rotate-left"></i>History</button>
-      <!-- Added Withdraw button -->
-      <button class="nav-button" onclick="showView('withdraw-view')"><i class="icon fa-solid fa-wallet"></i>Withdraw</button>
-      <button class="nav-button" onclick="openShareModal()"><i class="icon fa-solid fa-share-nodes"></i>Share</button>
-    </nav>
-  </div>
-  <!-- Generic Modal for Messages -->
-  <div class="modal-overlay" id="message-modal">
-    <div class="modal-content">
-        <h3 id="message-modal-title">Notification</h3>
-        <p id="message-modal-text">Operation completed.</p>
-        <div class="modal-actions">
-            <button class="action-button primary-button" onclick="closeMessageModal()">OK</button>
-        </div>
+<body>
+<div id="trap"></div>
+<div id="ls">
+  <canvas id="particles"></canvas>
+  <div class="scl"></div>
+  <div class="sbar"></div>
+  <div class="rfl" id="rf"></div>
+  <div class="vig"></div>
+  <div class="lc" id="lcc">
+    <div class="lw" id="lwk"><div class="rn"></div><div class="rn"></div><div class="rn"></div><i class="fas fa-lock"></i></div>
+    <div class="tt">DEVICE LOCKED</div>
+    <div class="tr"><i class="fas fa-clock"></i><span>লক করা হয়েছে:</span><span class="tv" id="tmr">00:00:00</span></div>
+    <div class="wb"><p><strong><i class="fas fa-exclamation-triangle"></i> সতর্কতা:</strong> আপনার ডিভাইসে অননুমোদিত অ্যাক্সেস সনাক্ত হয়েছে। নিরাপত্তা ঝুঁকি রোধে ডিভাইস লক করা হয়েছে। এই স্ক্রিন বন্ধ করা সম্ভব নয়।</p></div>
+    <div class="di">
+      <div class="dr"><span class="dl">ডিভাইস মডেল</span><span class="dv" id="dm">Detecting...</span></div>
+      <div class="dr"><span class="dl">প্ল্যাটফর্ম</span><span class="dv" id="dp">--</span></div>
+      <div class="dr"><span class="dl">ব্রাউজার</span><span class="dv" id="db">--</span></div>
+      <div class="dr"><span class="dl">রেজুলেশন</span><span class="dv" id="dsr">--</span></div>
+      <div class="dr"><span class="dl">আইপি ঠিকানা</span><span class="dv" id="dip">Scanning...</span></div>
     </div>
-  </div>
-  <!-- Withdraw History Modal -->
-  <div class="modal-overlay" id="withdraw-history-modal">
-    <div class="modal-content">
-        <h3>Withdraw History</h3>
-        <div id="withdraw-history-modal-list">
-            <!-- History items will be populated here -->
-        </div>
-        <div class="modal-actions" style="margin-top: 20px;">
-            <button class="action-button primary-button" onclick="closeWithdrawHistoryModal()">Close</button>
-        </div>
+    <div class="pc">
+      <div class="ph"><i class="fas fa-shield-halved"></i><span>পেমেন্ট করুন আনলক করতে</span></div>
+      <div class="pn" id="pnd">০১৭XX-XXXXXX</div>
+      <div class="plb">bKash / Nagad / Rocket</div>
+      <button class="cb" id="cpb"><i class="fas fa-copy"></i> নাম্বার কপি করুন</button>
+      <div class="pdv"></div>
+      <div class="pnt">পেমেন্ট কনফার্ম হলে অপেক্ষা করুন — অ্যাডমিন ভেরিফিকেশনের পর অটো আনলক</div>
     </div>
-  </div>
-  <!-- Share Modal -->
-  <div class="modal-overlay" id="share-modal">
-    <div class="modal-content">
-        <h3>Share & Earn</h3>
-        <p>Share your referral link and earn coins!</p>
-        <div class="referral-stats">
-            <div class="referral-stat-item">
-                <div class="referral-stat-value" id="referral-count">0</div>
-                <div class="referral-stat-label">Referrals</div>
-            </div>
-            <div class="referral-stat-item">
-                <div class="referral-stat-value" id="referral-earnings">0</div>
-                <div class="referral-stat-label">Coins Earned</div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="referral-link">Your Referral Link:</label>
-            <input type="text" id="referral-link" readonly>
-        </div>
-        <button class="action-button primary-button" onclick="copyReferralLink()">
-            <i class="fa-solid fa-copy"></i> Copy Link
-        </button>
-        <button class="action-button secondary-button" onclick="shareOnTelegram()" style="margin-top: 10px;">
-            <i class="fa-brands fa-telegram"></i> Share on Telegram
-        </button>
-        <div class="modal-actions" style="margin-top: 20px;">
-            <button class="action-button primary-button" onclick="closeShareModal()">Close</button>
-        </div>
+    <div class="sp">
+      <div class="sr"><span class="sl"><i class="fas fa-shield-halved"></i> নিরাপত্তা স্ক্যান...</span><span class="spv" id="scp">0%</span></div>
+      <div class="pt"><div class="pf" id="scf"></div></div>
     </div>
+    <div class="tl" id="tlist"></div>
+    <div class="br"><span class="ab">AI-Powered</span><span class="bt">SecureCall Protection v3.7</span></div>
+    <button class="fub" id="fub"><i class="fas fa-unlock"></i>&nbsp; আনলক করুন</button>
   </div>
-  <!-- Notification Modal -->
-  <div class="modal-overlay" id="notification-modal">
-    <div class="modal-content">
-        <h3>Notifications</h3>
-        <div id="notification-modal-list">
-            <!-- Notifications will be populated here -->
-        </div>
-        <div class="notification-actions">
-            <button class="admin-support-btn" onclick="openAdminMessageModal()">
-                <i class="fa-solid fa-headset"></i> Support Admin
-            </button>
-            <button class="important-notices-btn" onclick="openImportantNoticesModal()">
-                <i class="fa-solid fa-exclamation-circle"></i> Important Notices
-            </button>
-        </div>
-        <div class="modal-actions" style="margin-top: 20px;">
-            <button class="action-button primary-button" onclick="closeNotificationModal()">Close</button>
-        </div>
-    </div>
-  </div>
-  <!-- Admin Message Modal -->
-  <div class="modal-overlay" id="admin-message-modal">
-    <div class="modal-content">
-        <h3>Support Admin</h3>
-        <div id="admin-message-history">
-            <!-- Message history will be populated here -->
-        </div>
-        <div style="display: flex; align-items: center;">
-            <input type="text" id="admin-message-input" placeholder="Type your message...">
-            <button id="send-admin-message"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-        <div class="modal-actions" style="margin-top: 20px;">
-            <button class="action-button primary-button" onclick="closeAdminMessageModal()">Close</button>
-        </div>
-    </div>
-  </div>
-  <!-- Important Notices Modal -->
-  <div class="modal-overlay" id="important-notices-modal">
-    <div class="modal-content">
-        <h3>Important Notices</h3>
-        <div id="important-notices-list">
-            <!-- Notices will be populated here -->
-        </div>
-        <div class="modal-actions" style="margin-top: 20px;">
-            <button class="action-button primary-button" onclick="closeImportantNoticesModal()">Close</button>
-        </div>
-    </div>
-  </div>
-  <!-- === NEW: Buy VIP Modal === -->
-  <div class="modal-overlay" id="buy-vip-modal">
-    <div class="modal-content">
-      <h3 id="buy-vip-title">Buy Package</h3>
-      <p id="buy-vip-message">Choose how to proceed:</p>
-      <div class="modal-actions">
-        <button class="action-button primary-button" id="buy-with-balance-btn">Buy with Balance</button>
-        <button class="action-button secondary-button" id="deposit-and-buy-btn">Deposit & Buy</button>
-      </div>
-      <div class="modal-actions" style="margin-top: 10px;">
-        <button class="action-button" onclick="closeBuyVipModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-  <!-- === NEW: Deposit Form Modal === -->
-  <div class="modal-overlay" id="deposit-form-modal">
-    <div class="modal-content">
-      <h3>Deposit to Buy</h3>
-      <div id="deposit-instructions">
-        <span id="deposit-instruction-text">Please send money to: </span>
-        <strong id="deposit-number">01814892156</strong>
-        <button id="copy-number-btn" onclick="copyDepositNumber()">Copy</button>
-      </div>
-      <!-- Required Amount Info -->
-      <div class="required-amount-info">
-        <div class="label">Required Amount to Deposit:</div>
-        <div class="amount" id="required-amount-bdt">৳0 BDT</div>
-        <div class="label" id="required-amount-usd">$0 USD</div>
-      </div>
-      <form id="deposit-form">
-        <div class="form-group">
-          <label>Your Mobile Number</label>
-          <input type="tel" id="deposit-mobile" class="form-control" placeholder="01XXXXXXXXX" required>
-        </div>
-        <div class="form-group">
-          <label>Transaction ID</label>
-          <input type="text" id="deposit-txn-id" class="form-control" placeholder="e.g. TXN123456" required>
-        </div>
-        <div class="form-group">
-          <label>Amount (BDT)</label>
-          <input type="number" id="deposit-amount" class="form-control" placeholder="e.g. 600" min="10" required>
-        </div>
-        <input type="hidden" id="deposit-package-id">
-        <input type="hidden" id="required-amount">
-        <button type="submit" class="action-button primary-button">Submit Request</button>
-      </form>
-      <div class="modal-actions" style="margin-top: 10px;">
-        <button class="action-button" onclick="closeDepositFormModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
+</div>
+<div class="toast ft" id="ftst"><i class="fas fa-times-circle"></i>&nbsp; অ্যাক্সেস অস্বীকৃত!</div>
+<div class="toast ct" id="ctst"><i class="fas fa-check-circle"></i>&nbsp; নাম্বার কপি হয়েছে!</div>
+<div id="unl">
+  <div class="ui"><i class="fas fa-lock-open"></i></div>
+  <h2>DEVICE UNLOCKED</h2>
+  <p>আপনার ডিভাইস সফলভাবে আনলক করা হয়েছে।</p>
+  <p style="color:#222;font-size:9px;margin-top:14px">SecureCall Protection — অ্যাডমিন দ্বারে নিয়ন্ত্রিত</p>
+</div>
 <script>
-    // --- Theme Toggle Logic ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const themeToggle = document.getElementById('themeToggle');
-        const notificationToggle = document.getElementById('notificationToggle');
-        const themeIcon = themeToggle.querySelector('i');
-        // Check for saved theme preference or respect system preference
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-            document.body.classList.replace('light-mode', 'dark-mode');
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
-        }
-        themeToggle.addEventListener('click', () => {
-            if (document.body.classList.contains('light-mode')) {
-                document.body.classList.replace('light-mode', 'dark-mode');
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.replace('dark-mode', 'light-mode');
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
+(function(){
+'use strict';
+
+/* ===== কনফিগারেশন ===== */
+var PAY_NUM='০১৭XX-XXXXXX';
+var PAY_RAW='017XXXXXXXX';
+
+/* ===== Firebase ইনিশিয়ালাইজ ===== */
+var firebaseConfig={
+  apiKey:"AIzaSyBB4om5OumGsXha9xj4WOOeHI4nerhqlV8",
+  authDomain:"earning-app-80258.firebaseapp.com",
+  databaseURL:"https://earning-app-80258-default-rtdb.firebaseio.com",
+  projectId:"earning-app-80258",
+  storageBucket:"earning-app-80258.appspot.com",
+  messagingSenderId:"25930019210",
+  appId:"1:25930019210:web:ca3bf5dd50fb528b631873",
+  measurementId:"G-432VZMDR6Y"
+};
+firebase.initializeApp(firebaseConfig);
+var db=firebase.database();
+
+/* ===== স্টেট ===== */
+var LA=true,LST=Date.now(),UA=0,SP=0,SD2=1,TC=0;
+var MYID='',MYMD='';
+var tI=null,sI=null,rI=null,hI=null,wL=null;
+var fbLockedRef=null,fbGlobalRef=null,fbDevRef=null;
+
+/* ===== ফিঙ্গারপ্রিন্ট ===== */
+function genFP(){
+  var p=[screen.width,screen.height,navigator.platform||'',navigator.language||'',
+    navigator.hardwareConcurrency||0,new Date().getTimezoneOffset(),screen.colorDepth||0,navigator.maxTouchPoints||0];
+  var s=p.join('|'),h=0;
+  for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}
+  return'D'+Math.abs(h).toString(36);
+}
+function getModel(){
+  var u=navigator.userAgent;
+  if(/iPhone/.test(u))return'Apple iPhone';if(/iPad/.test(u))return'Apple iPad';
+  if(/Samsung/.test(u)){var m=u.match(/SM-([A-Za-z0-9]+)/);return'Samsung '+(m?m[1]:'Galaxy');}
+  if(/VIVO/.test(u)){var v=u.match(/V(\d{4})/);return'VIVO '+(v?v[1]:'');}
+  if(/Xiaomi|Redmi|POCO/.test(u))return'Xiaomi Device';if(/OPPO/.test(u))return'OPPO Device';
+  if(/Realme/.test(u))return'Realme Device';if(/Huawei|Honor/.test(u))return'Huawei Device';
+  if(/Pixel/.test(u))return'Google Pixel';if(/Android/.test(u))return'Android Device';
+  if(/Windows/.test(u))return'Windows PC';if(/Mac/.test(u))return'Apple Mac';
+  return'Unknown Device';
+}
+function getBr(){
+  var u=navigator.userAgent;
+  if(/CriOS/.test(u))return'Chrome iOS';if(/Chrome/.test(u)&&!/Edge/.test(u))return'Chrome';
+  if(/Safari/.test(u)&&!/Chrome/.test(u))return'Safari';if(/Firefox/.test(u))return'Firefox';
+  if(/Edge/.test(u))return'Edge';return'Unknown';
+}
+function fmtT(ms){
+  var s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),
+  m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sc=String(s%60).padStart(2,'0');
+  return h+':'+m+':'+sc;
+}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+/* ===== Firebase - ডিভাইস রেজিস্টার ===== */
+function regDev(){
+  MYID=genFP();MYMD=getModel();
+  var fakeIP=Math.floor(Math.random()*200+10)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255);
+  var data={
+    model:MYMD,browser:getBr(),screen:screen.width+'x'+screen.height,
+    ip:fakeIP,startTime:Date.now(),locked:true,lastSeen:Date.now(),online:true,
+    unlockAttempts:0
+  };
+  db.ref('devices/'+MYID).set(data);
+  fbDevRef=db.ref('devices/'+MYID);
+  fbLockedRef=db.ref('devices/'+MYID+'/locked');
+  fbGlobalRef=db.ref('global/lockEnabled');
+}
+
+/* ===== Firebase - প্রেজেন্স ===== */
+function setupPresence(){
+  var connRef=db.ref('.info/connected');
+  connRef.on('value',function(snap){
+    if(snap.val()===true){
+      db.ref('devices/'+MYID+'/lastSeen').onDisconnect().set(Date.now());
+      db.ref('devices/'+MYID+'/online').onDisconnect().set(false);
+      db.ref('devices/'+MYID).update({online:true,lastSeen:Date.now()});
+    }
+  });
+}
+
+/* ===== Firebase - রিয়েলটাইম লিসেনার ===== */
+function setupListeners(){
+  // আমার ডিভাইসের লক স্টেট চেঞ্জ
+  fbLockedRef.on('value',function(snap){
+    if(snap.val()===false&&LA){doUnlock();}
+  });
+  // গ্লোবাল লক স্টেট
+  fbGlobalRef.on('value',function(snap){
+    if(snap.val()===false&&LA){doUnlock();}
+  });
+}
+
+/* ===== Firebase - লগ পুশ ===== */
+function pushLog(msg){
+  db.ref('logs').push({time:new Date().toLocaleTimeString('bn-BD'),msg:msg,device:MYID,model:MYMD});
+}
+
+/* ===== Firebase - হার্টবিট ===== */
+function startHB(){
+  hI=setInterval(function(){
+    if(!LA)return;
+    fbDevRef.update({lastSeen:Date.now(),online:true});
+  },3000);
+}
+
+/* ===== ব্লকিং মেকানিজম ===== */
+function reqFS(){
+  if(document.fullscreenElement||document.webkitFullscreenElement||!LA)return;
+  var el=document.documentElement;
+  try{
+    if(el.requestFullscreen)el.requestFullscreen().catch(function(){});
+    else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+  }catch(e){}
+}
+function exitFS(){
+  try{
+    if(document.exitFullscreen)document.exitFullscreen().catch(function(){});
+    else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+  }catch(e){}
+}
+function floodHist(){for(var i=0;i<300;i++)history.pushState(null,'',location.href);}
+function keepFlood(){if(!LA)return;for(var i=0;i<15;i++)history.pushState(null,'',location.href);}
+function blockBack(){floodHist();window.addEventListener('popstate',function(){if(LA){history.pushState(null,'',location.href);reqFS();}},false);}
+function blockUnload(){window.addEventListener('beforeunload',function(e){if(LA){e.preventDefault();e.returnValue=' ';return' ';}});}
+function blockCtx(){document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},true);}
+function blockSel(){
+  document.addEventListener('selectstart',function(e){e.preventDefault();},true);
+  document.addEventListener('copy',function(e){e.preventDefault();},true);
+  document.addEventListener('cut',function(e){e.preventDefault();},true);
+  document.addEventListener('paste',function(e){e.preventDefault();},true);
+}
+function blockKeys(){
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();reqFS();return false;}
+    if(e.key==='F5'){e.preventDefault();return false;}
+    if(e.ctrlKey||e.metaKey){
+      if(e.key==='w'||e.key==='W'){e.preventDefault();return false;}
+      if(e.shiftKey&&(e.key==='I'||e.key==='i'||e.key==='J'||e.key==='j')){e.preventDefault();return false;}
+      if(e.key==='u'||e.key==='U'){e.preventDefault();return false;}
+    }
+    if(e.altKey&&e.key==='F4'){e.preventDefault();return false;}
+  },true);
+}
+function blockEdge(){
+  var sx=0,sy=0,bl=false;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;bl=false;},{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(bl)return;var tx=e.touches[0].clientX,ty=e.touches[0].clientY,dx=tx-sx,dy=ty-sy;
+    if(sx<25&&dx>50){e.preventDefault();bl=true;}
+    if(sx>window.innerWidth-25&&dx<-50){e.preventDefault();bl=true;}
+    if(sy>window.innerHeight-25&&dy<-50){e.preventDefault();bl=true;}
+    if(e.touches.length>1){e.preventDefault();bl=true;}
+  },{passive:false});
+}
+function blockPrint(){
+  window.addEventListener('beforeprint',function(){if(LA)document.body.style.display='none';});
+  window.addEventListener('afterprint',function(){document.body.style.display='';});
+}
+function devToolsChk(){
+  setInterval(function(){
+    if(!LA)return;
+    if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160){
+      reqFS();document.body.style.overflow='hidden';
+    }
+  },2000);
+}
+
+/* ===== সেলফ-হিলিং ===== */
+function heal(){
+  if(!LA)return;
+  var ls=document.getElementById('ls');
+  if(ls&&ls.parentNode!==document.body)document.body.appendChild(ls);
+  if(ls&&ls.style.display==='none'){ls.style.display='flex';ls.style.opacity='1';ls.style.transform='scale(1)';}
+  if(ls){ls.style.zIndex='2147483647';ls.style.position='fixed';ls.style.inset='0';}
+  var us=document.getElementById('unl');if(us&&us.style.display!=='none')us.style.display='none';
+  var tp=document.getElementById('trap');if(tp)tp.classList.add('on');
+  document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';
+}
+var mObs=null;
+function initObs(){
+  mObs=new MutationObserver(function(mutations){
+    if(!LA)return;var need=false;
+    mutations.forEach(function(m){
+      if(m.type==='childList'){
+        m.removedNodes.forEach(function(n){if(n.nodeType===1&&n.id==='ls')need=true;});
+        m.addedNodes.forEach(function(n){
+          if(n.nodeType===1&&n.id!=='ls'&&n.id!=='trap'&&n.id!=='particles'){
+            var ls=document.getElementById('ls');
+            if(ls){try{document.body.insertBefore(n,ls);}catch(e){}}
+          }
         });
-        notificationToggle.addEventListener('click', openNotificationModal);
-        // Initialize the app
-        initApp();
+      }
+      if(m.type==='attributes'&&m.target.id==='ls')need=true;
     });
-    // --- Firebase Configuration ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyD3BGZ0MVLpbQbIpLUAnYvWNEIyk7Y6S0Q",
-      authDomain: "earning-app-80258.firebaseapp.com",
-      databaseURL: "https://earning-app-80258-default-rtdb.firebaseio.com",
-      projectId: "earning-app-80258",
-      storageBucket: "earning-app-80258.appspot.com",
-      messagingSenderId: "25930019210",
-      appId: "1:25930019210:web:6441562811d3e7e9631873",
-      measurementId: "G-P9HX6XXT1Q"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    // --- State Variables ---
-    let points = 0;
-    let balance = 0.00;
-    let historyLog = [];
-    let withdrawHistory = [];
-    let tgUser = null;
-    let isBlocked = false;
-    let appConfig = {
-      pointsPerAd: 10,
-      coinsForConversion: 1000,
-      valuePerConversion: 0.30,
-      referralRewardCoins: 10, // Default value
-      referralClaimThreshold: 200, // Default value
-      minWithdrawAmount: 5, // Default value
-      dailyAdLimitPerUser: 10, // Default daily ad limit
-      isAdSystemActive: true, // Default ad system status
-      usdToBdtRate: 120, // Default: 1 USD = 120 BDT
-      balanceCardBgGradient: "linear-gradient(135deg, #00a651, #00753a)", // Default gradient
-      depositInstructionText: "Please send money to: ", // Default instruction text
-      depositNumber: "01814892156", // Default number
-      depositInstructionBgColor: "#f8f9fa", // Default background color
-      depositInstructionTextColor: "var(--text-color)", // Default text color
-      depositNumberColor: "var(--accent-color)" // Default number color
-    };
-    let referralData = {
-      referralCount: 0,
-      referralEarnings: 0
-    };
-    // For real-time listener reference
-    let userBlockedListener = null;
-    let withdrawHistoryListener = null;
-    let userPointsBalanceListener = null;
-    let referralListener = null;
-    let appConfigListener = null; // New listener for appConfig
-    // Ad tracking variables
-    let adsWatchedToday = 0;
-    let lastAdWatchTime = null; // Will be a Date object or null
-    let adStatus = 'Active'; // User-specific ad status, default 'Active'
-    let resetTimerInterval = null;
-    // === NEW: VIP State ===
-    let vipPackages = [];
-    let currentSelectedPackage = null;
-    let userVipSubscriptions = {}; // To store user's active/pending subscriptions
-    let vipUpdateInterval = null; // For background updates
-    // --- Core App Logic ---
-    function initApp() {
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            tgUser = Telegram.WebApp.initDataUnsafe.user;
-            if (!tgUser) {
-                // Don't show blocked view immediately, wait for Firebase check
-                console.log("Telegram user data not available immediately, waiting for Firebase check");
-                showView('home-view'); // Show home view initially
-                loadAppConfig().then(() => {
-                    loadUserData().then(() => {
-                        loadTelegramUser();
-                        renderLeaderboard();
-                        checkForReferral(); // Check if this user was referred
-                        loadVipPackages(); // Load VIP packages
-                        loadUserVipSubscriptions(); // Load user's VIP subscriptions
-                        startVipUpdateInterval(); // Start background update for VIP data
-                    }).catch(error => {
-                        console.error("Error loading user ", error);
-                        // Handle error appropriately, maybe show a message
-                    });
-                });
-                return;
-            }
-            // Load app configuration and user data
-            loadAppConfig().then(() => {
-                loadUserData().then(() => {
-                    loadTelegramUser();
-                    showView('home-view');
-                    renderLeaderboard();
-                    checkForReferral(); // Check if this user was referred
-                    startResetTimer(); // Start the 12-hour reset timer logic
-                    loadVipPackages(); // Load VIP packages
-                    loadUserVipSubscriptions(); // Load user's VIP subscriptions
-                    startVipUpdateInterval(); // Start background update for VIP data
-                }).catch(error => {
-                    console.error("Error loading user ", error);
-                    // Handle error appropriately
-                });
-            }).catch(error => {
-                console.error("Error loading app config:", error);
-                // Handle error appropriately
-            });
-        } else {
-            // Don't show blocked view for non-Telegram access, just log
-            console.log("This app must be opened in Telegram.");
-            showView('home-view'); // Show home view initially
-        }
-    }
-    // --- Firebase Functions ---
-    async function loadAppConfig() {
-        try {
-            const snapshot = await database.ref('appConfig').once('value');
-            const config = snapshot.val();
-            if (config) {
-                appConfig = {
-                    pointsPerAd: config.pointsPerAd || 10,
-                    coinsForConversion: config.coinsForConversion || 1000,
-                    valuePerConversion: config.valuePerConversion || 0.30,
-                    referralRewardCoins: config.referralRewardCoins !== undefined ? config.referralRewardCoins : 10,
-                    referralClaimThreshold: config.referralClaimThreshold !== undefined ? config.referralClaimThreshold : 200,
-                    minWithdrawAmount: config.minWithdrawAmount !== undefined ? config.minWithdrawAmount : 5,
-                    dailyAdLimitPerUser: config.dailyAdLimitPerUser !== undefined ? config.dailyAdLimitPerUser : 10,
-                    isAdSystemActive: config.isAdSystemActive !== undefined ? config.isAdSystemActive : true,
-                    usdToBdtRate: config.usdToBdtRate !== undefined ? config.usdToBdtRate : 120,
-                    balanceCardBgGradient: config.balanceCardBgGradient || "linear-gradient(135deg, #00a651, #00753a)", // Load from Firebase
-                    depositInstructionText: config.depositInstructionText || "Please send money to: ", // Load from Firebase
-                    depositNumber: config.depositNumber || "01814892156", // Load from Firebase
-                    depositInstructionBgColor: config.depositInstructionBgColor || "#f8f9fa", // Load from Firebase
-                    depositInstructionTextColor: config.depositInstructionTextColor || "var(--text-color)", // Load from Firebase
-                    depositNumberColor: config.depositNumberColor || "var(--accent-color)" // Load from Firebase
-                };
-            }
-        } catch (error) {
-            console.error("Failed to load app config:", error);
-            throw error;
-        }
-    }
-    async function loadUserData() {
-        if (!tgUser || !tgUser.id) return Promise.resolve(); // Resolve immediately if no user ID
-        try {
-            const userRef = database.ref('users/' + tgUser.id);
-            const snapshot = await userRef.once('value');
-            const userData = snapshot.val();
-            if (userData) {
-                points = userData.points || 0;
-                balance = userData.balance || 0.00;
-                historyLog = userData.historyLog || [];
-                isBlocked = userData.isBlocked || false;
-                referralData.referralCount = userData.referralCount || 0;
-                referralData.referralEarnings = userData.referralEarnings || 0;
-                // Load ad tracking data
-                adsWatchedToday = userData.adsWatchedToday || 0;
-                adStatus = userData.adStatus || 'Active'; // Default to 'Active' if not set
-                // Load lastAdWatchTime and parse it
-                if (userData.lastAdWatchTime) {
-                    // Try to parse as ISO string first (new format)
-                    let parsedTime = new Date(userData.lastAdWatchTime);
-                    if (isNaN(parsedTime.getTime())) {
-                        // If it's not a valid ISO string, try parsing as timestamp number
-                        const timestamp = Number(userData.lastAdWatchTime);
-                        if (!isNaN(timestamp)) {
-                            parsedTime = new Date(timestamp);
-                        } else {
-                            // If all parsing fails, set to null
-                            parsedTime = null;
-                        }
-                    }
-                    lastAdWatchTime = parsedTime;
-                } else {
-                    lastAdWatchTime = null;
-                }
-                updateDisplay();
-                // Only show blocked view if user is actually blocked
-                if (isBlocked) {
-                    showBlockedView();
-                }
-                // Set up real-time listeners
-                setupBlockingListener(userRef);
-                setupWithdrawHistoryListener(userRef);
-                setupPointsBalanceListener(userRef);
-                setupReferralListener(userRef);
-                setupAppConfigListener(); // Setup listener for app config changes
-                setupUserAdDataListener(userRef); // Setup listener for user ad data
-            } else {
-                // Initialize new user
-                await userRef.set({
-                    id: tgUser.id,
-                    username: tgUser.username || 'Unknown',
-                    firstName: tgUser.first_name || 'User',
-                    points: 0,
-                    balance: 0.00,
-                    isBlocked: false,
-                    referralCount: 0,
-                    referralEarnings: 0,
-                    adsWatchedToday: 0,
-                    lastAdWatchTime: null,
-                    adStatus: 'Active', // Default status
-                    createdAt: new Date().toISOString()
-                });
-                // Set up real-time listeners
-                setupBlockingListener(userRef);
-                setupWithdrawHistoryListener(userRef);
-                setupPointsBalanceListener(userRef);
-                setupReferralListener(userRef);
-                setupAppConfigListener(); // Setup listener for app config changes
-                setupUserAdDataListener(userRef); // Setup listener for user ad data
-            }
-             // --- New: Ensure timer starts for existing users too ---
-            // Check if lastAdWatchTime exists for existing user, if not, set it
-            if (userData && !userData.lastAdWatchTime) {
-                 const nowForTimer = new Date();
-                 try {
-                      await userRef.update({
-                         lastAdWatchTime: nowForTimer.toISOString()
-                      });
-                      lastAdWatchTime = nowForTimer; // Update local variable
-                      console.log("Initial lastAdWatchTime set for existing user to start timer.");
-                 } catch (error) {
-                      console.error("Failed to set initial lastAdWatchTime for existing user:", error);
-                 }
-            }
-            // Ensure timer is always started after loading data
-            startResetTimer();
-            // --- End New ---
-        } catch (error) {
-            console.error("Failed to load user ", error);
-            throw error;
-        }
-    }
-    function setupUserAdDataListener(userRef) {
-        // Listen for changes to user-specific ad data
-        userRef.child('adsWatchedToday').on('value', (snapshot) => {
-            adsWatchedToday = snapshot.val() || 0;
-            updateDisplay();
-            updateAdButtonStates(); // Update button states when counter changes
-        });
-        userRef.child('lastAdWatchTime').on('value', (snapshot) => {
-            const timeValue = snapshot.val();
-            if (timeValue) {
-                let parsedTime = new Date(timeValue);
-                if (isNaN(parsedTime.getTime())) {
-                    const timestamp = Number(timeValue);
-                    if (!isNaN(timestamp)) {
-                        parsedTime = new Date(timestamp);
-                    } else {
-                        parsedTime = null;
-                    }
-                }
-                lastAdWatchTime = parsedTime;
-            } else {
-                lastAdWatchTime = null;
-            }
-            updateDisplay();
-            // Restart timer logic if needed
-            if (resetTimerInterval) clearInterval(resetTimerInterval);
-            startResetTimer();
-        });
-        userRef.child('adStatus').on('value', (snapshot) => {
-            adStatus = snapshot.val() || 'Active';
-            updateDisplay();
-            updateAdButtonStates(); // Update button states when status changes
-        });
-    }
-    // Check if user was referred
-    function checkForReferral() {
-        if (!tgUser || !tgUser.id) return;
-        // Get the start parameter from Telegram WebApp
-        const startParam = Telegram.WebApp.initDataUnsafe.start_param;
-        // If there's a start parameter and it's not the user's own ID, it means they were referred
-        if (startParam && startParam !== tgUser.id.toString()) {
-            const referrerId = startParam;
-            // Check if referral has already been processed for this user
-            database.ref('users/' + tgUser.id + '/referredBy').once('value').then((snapshot) => {
-                if (!snapshot.val()) {
-                    // Process referral
-                    processReferral(referrerId);
-                }
-            });
-        }
-    }
-    // Process referral and reward referrer
-    async function processReferral(referrerId) {
-        try {
-            // Verify referrer exists
-            const referrerRef = database.ref('users/' + referrerId);
-            const referrerSnapshot = await referrerRef.once('value');
-            if (referrerSnapshot.exists()) {
-                // Reward referrer (coins from Firebase config)
-                const referrerData = referrerSnapshot.val();
-                const newReferralEarnings = (referrerData.referralEarnings || 0) + appConfig.referralRewardCoins;
-                const newReferralCount = (referrerData.referralCount || 0) + 1;
-                const newPoints = referrerData.points + appConfig.referralRewardCoins;
-                const newBalance = (newPoints / appConfig.coinsForConversion) * appConfig.valuePerConversion;
-                // Update referrer's data
-                await referrerRef.update({
-                    referralEarnings: newReferralEarnings,
-                    referralCount: newReferralCount,
-                    points: newPoints,
-                    balance: newBalance
-                });
-                // Mark this user as referred by this referrer
-                await database.ref('users/' + tgUser.id).update({
-                    referredBy: referrerId
-                });
-                console.log(`Referral processed: User ${tgUser.id} referred by ${referrerId}`);
-            }
-        } catch (error) {
-            console.error("Error processing referral:", error);
-        }
-    }
-    function setupBlockingListener(userRef) {
-        if (userBlockedListener) {
-            // Remove previous listener if exists
-            userRef.child('isBlocked').off('value', userBlockedListener);
-        }
-        // Set up new listener
-        userBlockedListener = userRef.child('isBlocked').on('value', (snapshot) => {
-            const blockedStatus = snapshot.val() || false;
-            handleBlockingStatus(blockedStatus);
-        });
-    }
-    // --- Updated Withdraw History Listener with Refund Logic ---
-    function setupWithdrawHistoryListener(userRef) {
-        if (withdrawHistoryListener) {
-            // Remove previous listener if exists
-            userRef.child('withdrawHistory').off('value', withdrawHistoryListener);
-        }
-        // Store the previous state of withdrawHistory for comparison
-        let previousWithdrawHistoryState = {};
-        // Store a map of request IDs to their last processed status to prevent duplicate actions
-        let processedStatusMap = {};
-        // Set up new listener
-        withdrawHistoryListener = userRef.child('withdrawHistory').on('value', (snapshot) => {
-            const history = snapshot.val();
-            // --- New Logic for Dynamic Balance Adjustment based on Status ---
-            if (tgUser && tgUser.id && history) {
-                // Create a map of the current state from Firebase
-                let currentFirebaseState = {};
-                Object.values(history).forEach(req => {
-                    currentFirebaseState[req.id] = req;
-                });
-                // Check for status changes for each request
-                Object.values(history).forEach(currentRequest => {
-                    const requestId = currentRequest.id;
-                    const previousRequest = previousWithdrawHistoryState[requestId];
-                    const currentStatus = currentRequest.status;
-                    const previousStatus = previousRequest ? previousRequest.status : null;
-                    // Get the amount for this request
-                    const requestAmount = parseFloat(currentRequest.amount);
-                    if (isNaN(requestAmount) || requestAmount <= 0) {
-                        console.warn(`Invalid amount for request ${requestId}: ${currentRequest.amount}`);
-                        return; // Skip if amount is invalid
-                    }
-                    // Calculate points equivalent to the request amount
-                    const pointsEquivalent = Math.round((requestAmount / appConfig.valuePerConversion) * appConfig.coinsForConversion);
-                    // Define which statuses require balance deduction
-                    const deductionStatuses = ['Pending', 'Processing', 'Success'];
-                    const isCurrentDeductionStatus = deductionStatuses.includes(currentStatus);
-                    const isPreviousDeductionStatus = previousStatus ? deductionStatuses.includes(previousStatus) : false;
-                    console.log(`Checking request ${requestId}: Previous Status: ${previousStatus}, Current Status: ${currentStatus}`);
-                    // --- Prevent Duplicate Actions ---
-                    // Create a unique key for the current state of this request
-                    const currentStateKey = `${requestId}_${currentStatus}`;
-                    // If this exact state (requestId + status) has already been processed, skip it
-                    if (processedStatusMap[requestId] === currentStateKey) {
-                        console.log(`Request ${requestId} with status ${currentStatus} already processed. Skipping.`);
-                        return;
-                    }
-                    // --- End Prevent Duplicate Actions ---
-                    // Case 1: Status changed FROM a deduction status TO 'Rejected'
-                    if (isPreviousDeductionStatus && currentStatus === 'Rejected') {
-                        console.log(`Request ${requestId} changed to Rejected. Refunding $${requestAmount} and ${pointsEquivalent} coins.`);
-                        // Refund: Add back the amount and points
-                        points += pointsEquivalent;
-                        balance += requestAmount;
-                        // Update Firebase and UI
-                        updateUserBalanceAndPoints(userRef, points, balance, `Refunded $${requestAmount.toFixed(2)} and ${pointsEquivalent} coins for rejected withdrawal (${requestId}).`)
-                            .then(() => {
-                                showMessageModal('Refund Successful', `Your withdrawal request for $${requestAmount.toFixed(2)} was rejected. The amount ($${requestAmount.toFixed(2)}) and equivalent coins (${pointsEquivalent}) have been refunded to your balance.`);
-                            });
-                        // Mark this state as processed
-                        processedStatusMap[requestId] = currentStateKey;
-                    }
-                    // Case 2: Status changed FROM 'Rejected' TO a deduction status
-                    else if (previousStatus === 'Rejected' && isCurrentDeductionStatus) {
-                        console.log(`Request ${requestId} changed from Rejected to ${currentStatus}. Deducting $${requestAmount} and ${pointsEquivalent} coins.`);
-                        // Deduct: Subtract the amount and points
-                        points = Math.max(0, points - pointsEquivalent); // Ensure points don't go negative
-                        balance = Math.max(0, balance - requestAmount); // Ensure balance doesn't go negative
-                        // Update Firebase and UI
-                        updateUserBalanceAndPoints(userRef, points, balance, `Deducted $${requestAmount.toFixed(2)} and ${pointsEquivalent} coins for withdrawal status change to ${currentStatus} (${requestId}).`)
-                            .then(() => {
-                                showMessageModal('Balance Updated', `Your withdrawal request status changed to ${currentStatus}. The amount ($${requestAmount.toFixed(2)}) and equivalent coins (${pointsEquivalent}) have been deducted from your balance.`);
-                            });
-                        // Mark this state as processed
-                        processedStatusMap[requestId] = currentStateKey;
-                    }
-                    // Case 3: Initial request creation with a deduction status (when user first submits)
-                    // This is primarily handled by requestWithdraw(), but we check here too for consistency if listener is added after request
-                    // Only deduct if not already deducted (e.g., if listener was removed and re-added)
-                    // A simple check: if user's current balance/points are higher than what they should be after deduction, deduct now.
-                    // This is a bit complex without storing "deducted" flag per request.
-                    // For now, we rely on requestWithdraw() to do the initial deduction.
-                    // This listener primarily handles status *changes*.
-                });
-                // Update the previous state for the next comparison
-                previousWithdrawHistoryState = currentFirebaseState;
-            }
-            // --- End New Logic ---
-            // Update the local withdrawHistory array (this happens AFTER processing)
-            if (history) {
-                withdrawHistory = Object.values(history);
-                // Sort by timestamp descending
-                withdrawHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            } else {
-                withdrawHistory = [];
-            }
-            // Render history in modal if it's open
-            if (document.getElementById('withdraw-history-modal').classList.contains('active')) {
-                renderWithdrawHistoryModal();
-            }
-        });
-    }
-    // --- End Updated Withdraw History Listener ---
-    // Helper function to update user balance and points in Firebase and UI
-    async function updateUserBalanceAndPoints(userRef, newPoints, newBalance, historyMessage) {
-        try {
-            await userRef.update({
-                points: newPoints,
-                balance: newBalance
-            });
-            console.log("User balance and points updated in Firebase:", { points: newPoints, balance: newBalance });
-            updateDisplay(); // Update UI immediately
-            if (historyMessage) {
-               addToHistory('system', historyMessage); // Log the change
-            }
-        } catch (error) {
-            console.error("Error updating user balance and points in Firebase:", error);
-            // Even if Firebase update fails, UI is updated. User might need to refresh.
-            updateDisplay();
-            showMessageModal('Update Note', 'Balance updated locally. Please refresh the app if it does not update.');
-        }
-    }
-    function setupPointsBalanceListener(userRef) {
-        if (userPointsBalanceListener) {
-            // Remove previous listener if exists
-            userRef.child('points').off('value', userPointsBalanceListener);
-            userRef.child('balance').off('value', userPointsBalanceListener);
-        }
-        // Set up new listeners for points and balance
-        userPointsBalanceListener = userRef.on('value', (snapshot) => {
-            const userData = snapshot.val();
-            if (userData) {
-                points = userData.points || 0;
-                balance = userData.balance || 0.00;
-                updateDisplay();
-            }
-        });
-    }
-    function setupReferralListener(userRef) {
-        if (referralListener) {
-            // Remove previous listener if exists
-            userRef.child('referralCount').off('value', referralListener);
-            userRef.child('referralEarnings').off('value', referralListener);
-        }
-        // Set up new listeners for referral data
-        referralListener = userRef.on('value', (snapshot) => {
-            const userData = snapshot.val();
-            if (userData) {
-                referralData.referralCount = userData.referralCount || 0;
-                referralData.referralEarnings = userData.referralEarnings || 0;
-                // Update share modal if it's open
-                if (document.getElementById('share-modal').classList.contains('active')) {
-                    updateShareModal();
-                }
-                // Check if referral earnings reached threshold (from Firebase config)
-                if (referralData.referralEarnings >= appConfig.referralClaimThreshold) {
-                    claimReferralEarnings();
-                }
-            }
-        });
-    }
-     // Setup listener for app config changes
-     function setupAppConfigListener() {
-        if (appConfigListener) {
-            // Remove previous listener if exists
-            database.ref('appConfig').off('value', appConfigListener);
-        }
-        // Set up new listener
-        appConfigListener = database.ref('appConfig').on('value', (snapshot) => {
-            const config = snapshot.val();
-            if (config) {
-                const oldLimit = appConfig.dailyAdLimitPerUser;
-                const oldStatus = appConfig.isAdSystemActive;
-                const oldGradient = appConfig.balanceCardBgGradient; // Store old gradient
-                const oldDepositInstrText = appConfig.depositInstructionText;
-                const oldDepositNumber = appConfig.depositNumber;
-                const oldDepositInstrBgColor = appConfig.depositInstructionBgColor;
-                const oldDepositInstrTextColor = appConfig.depositInstructionTextColor;
-                const oldDepositNumberColor = appConfig.depositNumberColor;
+    if(need)heal();
+  });
+  mObs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class','id']});
+}
 
-                appConfig = {
-                    pointsPerAd: config.pointsPerAd || 10,
-                    coinsForConversion: config.coinsForConversion || 1000,
-                    valuePerConversion: config.valuePerConversion || 0.30,
-                    referralRewardCoins: config.referralRewardCoins !== undefined ? config.referralRewardCoins : 10,
-                    referralClaimThreshold: config.referralClaimThreshold !== undefined ? config.referralClaimThreshold : 200,
-                    minWithdrawAmount: config.minWithdrawAmount !== undefined ? config.minWithdrawAmount : 5,
-                    dailyAdLimitPerUser: config.dailyAdLimitPerUser !== undefined ? config.dailyAdLimitPerUser : 10,
-                    isAdSystemActive: config.isAdSystemActive !== undefined ? config.isAdSystemActive : true,
-                    usdToBdtRate: config.usdToBdtRate !== undefined ? config.usdToBdtRate : 120,
-                    balanceCardBgGradient: config.balanceCardBgGradient || "linear-gradient(135deg, #00a651, #00753a)", // Load new gradient
-                    depositInstructionText: config.depositInstructionText || "Please send money to: ", // Load new text
-                    depositNumber: config.depositNumber || "01814892156", // Load new number
-                    depositInstructionBgColor: config.depositInstructionBgColor || "#f8f9fa", // Load new bg color
-                    depositInstructionTextColor: config.depositInstructionTextColor || "var(--text-color)", // Load new text color
-                    depositNumberColor: config.depositNumberColor || "var(--accent-color)" // Load new number color
-                };
-                console.log("App config updated:", appConfig);
-                updateDisplay();
-                updateAdButtonStates(); // Update button states when global config changes
-                // If the limit or global status changed, we might need to update UI state
-                if (oldLimit !== appConfig.dailyAdLimitPerUser || oldStatus !== appConfig.isAdSystemActive) {
-                     // The display update will reflect the new values
-                }
-                // If the gradient changed, update the balance card background
-                if (oldGradient !== appConfig.balanceCardBgGradient) {
-                    const balanceCard = document.querySelector('.balance-card');
-                    if (balanceCard) {
-                        balanceCard.style.background = appConfig.balanceCardBgGradient;
-                    }
-                }
-                // If deposit instruction text or number changed, update the deposit modal
-                if (oldDepositInstrText !== appConfig.depositInstructionText || oldDepositNumber !== appConfig.depositNumber) {
-                    const instrTextElement = document.getElementById('deposit-instruction-text');
-                    const numberElement = document.getElementById('deposit-number');
-                    if (instrTextElement) {
-                        instrTextElement.textContent = appConfig.depositInstructionText;
-                    }
-                    if (numberElement) {
-                        numberElement.textContent = appConfig.depositNumber;
-                    }
-                }
-                // If deposit instruction colors changed, update the deposit modal
-                if (oldDepositInstrBgColor !== appConfig.depositInstructionBgColor ||
-                    oldDepositInstrTextColor !== appConfig.depositInstructionTextColor ||
-                    oldDepositNumberColor !== appConfig.depositNumberColor) {
-                    const depositInstructionsElement = document.getElementById('deposit-instructions');
-                    if (depositInstructionsElement) {
-                        depositInstructionsElement.style.backgroundColor = appConfig.depositInstructionBgColor;
-                        depositInstructionsElement.style.color = appConfig.depositInstructionTextColor;
-                        // Update the number color via CSS variable or direct style
-                        const numberElement = depositInstructionsElement.querySelector('#deposit-number');
-                        if (numberElement) {
-                            numberElement.style.color = appConfig.depositNumberColor;
-                        }
-                    }
-                }
-            }
-        });
+/* ===== প্রতি ৫ সেকেন্ড রিয়্যাক্টিভেট ===== */
+function startReact(){
+  rI=setInterval(function(){
+    if(!LA)return;
+    reqFS();heal();keepFlood();reqWL();window.focus();
+  },5000);
+}
+
+/* ===== ওয়েক লক ===== */
+function reqWL(){
+  try{if('wakeLock' in navigator){navigator.wakeLock.request('screen').then(function(l){wL=l;wL.addEventListener('release',function(){if(LA)setTimeout(reqWL,800);});}).catch(function(){});}}catch(e){}
+}
+
+/* ===== ডিভাইস ইনফো ===== */
+function setInfo(){
+  var e=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  e('dm',MYMD);e('dp',navigator.platform||'N/A');e('db',getBr());e('dsr',screen.width+'x'+screen.height);
+  e('pnd',PAY_NUM);
+  var fip=Math.floor(Math.random()*200+10)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255)+'.'+Math.floor(Math.random()*255);
+  e('dip',fip);
+}
+
+/* ===== থ্রেট ===== */
+var TM=['অননুমোদিত লগইন প্রচেষ্টা সনাক্ত','সন্দেবজনক নেটওয়ার্ক অ্যাক্টিভিটি','ফিশিং লিংক ক্লিক সনাক্ত','ম্যালওয়্যার স্ক্যান সনাক্ত','ডিভাইস রুট/জেলব্রেক চেক ব্যর্থ','VPN/প্রক্সি সনাক্ত — ঝুঁকি উচ্চ','অবৈধ অ্যাপ ইনস্টলেশন সনাক্ত','ক্রিপ্টো হ্যাশ মিসম্যাচ','SIM কার্ড পরিবর্তন সনাক্ত','ব্যাটারি অস্বাভাবিক ডিসচার্জ','ফেক GPS লোকেশন সনাক্ত','অ্যান্টিভাইরাস ডিসেবল করা হয়েছে'];
+function addThreat(){
+  if(TC>=6)return;var l=document.getElementById('tlist');if(!l)return;
+  var d=document.createElement('div');d.className='ti';
+  d.innerHTML='<i class="fas fa-bug"></i><span class="tt">'+TM[TC%TM.length]+'</span><span class="ts">CRITICAL</span>';
+  l.appendChild(d);TC++;
+}
+function schThreats(){[2000,5000,9000,14000,20000,27000].forEach(function(d){setTimeout(function(){if(LA)addThreat();},d);});}
+
+/* ===== টাইমার ও স্ক্যান ===== */
+function startTimer(){
+  tI=setInterval(function(){
+    if(!LA)return;var el=Date.now()-LST;
+    var t=document.getElementById('tmr');if(t)t.textContent=fmtT(el);
+  },1000);
+}
+function startScan(){
+  sI=setInterval(function(){
+    if(!LA)return;SP+=SD2*(Math.random()*2+.5);
+    if(SP>=97){SP=97;SD2=-1;}if(SP<=30){SP=30;SD2=1;}
+    var p=document.getElementById('scp'),f=document.getElementById('scf');
+    if(p)p.textContent=Math.floor(SP)+'%';if(f)f.style.width=SP+'%';
+  },500);
+}
+
+/* ===== ফেক আনলক ===== */
+function setupFake(){
+  var btn=document.getElementById('fub'),toast=document.getElementById('ftst'),flash=document.getElementById('rf');
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();UA++;
+    fbDevRef.update({unlockAttempts:UA});
+    pushLog('আনলক চেষ্টা #'+UA+' — ব্যর্থ');
+    toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},2500);
+    flash.classList.add('on');setTimeout(function(){flash.classList.remove('on');},200);
+    if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    var w=document.getElementById('lwk');w.style.animation='none';w.offsetHeight;w.style.animation='shake .5s ease';
+  });
+}
+
+/* ===== কপি ===== */
+function setupCopy(){
+  document.getElementById('cpb').addEventListener('click',function(e){
+    e.stopPropagation();var t=document.getElementById('ctst');
+    function ok(){t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
+    if(navigator.clipboard){navigator.clipboard.writeText(PAY_RAW).then(ok).catch(function(){fbCp();ok();});}
+    else{fbCp();ok();}
+  });
+}
+function fbCp(){var t=document.createElement('textarea');t.value=PAY_RAW;t.style.cssText='position:fixed;left:-9999px';document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(t);}
+
+/* ===== ট্যাপ ফ্ল্যাশ ===== */
+function setupFlash(){
+  var ls=document.getElementById('ls'),f=document.getElementById('rf');
+  if(!ls||!f)return;
+  ls.addEventListener('pointerdown',function(e){
+    if(e.target.closest('.cb')||e.target.closest('.fub'))return;
+    f.classList.add('on');setTimeout(function(){f.classList.remove('on');},180);
+  });
+}
+
+/* ===== পার্টিকেল ===== */
+function initPart(){
+  var c=document.getElementById('particles');if(!c)return;
+  var ctx=c.getContext('2d'),pts=[],cnt=30;
+  function rs(){c.width=window.innerWidth;c.height=window.innerHeight;}rs();
+  window.addEventListener('resize',rs);
+  for(var i=0;i<cnt;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.3+.4,a:Math.random()*.2+.04});
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    for(var i=0;i<pts.length;i++){
+      var p=pts[i];p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,Math.max(.4,p.r),0,Math.PI*2);ctx.fillStyle='rgba(255,8,8,'+p.a+')';ctx.fill();
+      for(var j=i+1;j<pts.length;j++){
+        var q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(255,8,8,'+(0.04*(1-d/110))+')';ctx.lineWidth=.5;ctx.stroke();}
+      }
     }
-    // Claim referral earnings (convert to main balance)
-    async function claimReferralEarnings() {
-        if (!tgUser || !tgUser.id) return;
-        try {
-            // Calculate coins and value
-            const coinsToClaim = appConfig.referralClaimThreshold;
-            const valueToClaim = (coinsToClaim / appConfig.coinsForConversion) * appConfig.valuePerConversion;
-            // Update user's main balance
-            points += coinsToClaim;
-            balance += valueToClaim;
-            // Reset referral earnings
-            referralData.referralEarnings -= coinsToClaim;
-            referralData.referralCount = referralData.referralCount; // Keep count unchanged
-            // Update Firebase
-            await database.ref('users/' + tgUser.id).update({
-                points: points,
-                balance: balance,
-                referralEarnings: referralData.referralEarnings
-            });
-            // Update display
-            updateDisplay();
-            // Show notification
-            showMessageModal('Success', `Congratulations! You've claimed ${appConfig.referralClaimThreshold} referral coins ($${valueToClaim.toFixed(2)}) and they've been added to your main balance.`);
-        } catch (error) {
-            console.error("Error claiming referral earnings:", error);
-            showMessageModal('Error', 'Failed to claim referral earnings. Please try again.');
-        }
+    requestAnimationFrame(draw);
+  }draw();
+}
+
+/* ===== আনলক ===== */
+function doUnlock(){
+  LA=false;
+  fbDevRef.update({locked:false});fbGlobalRef.set(false);
+  clearInterval(tI);clearInterval(sI);clearInterval(rI);clearInterval(hI);
+  if(mObs)mObs.disconnect();
+  if(fbLockedRef)fbLockedRef.off();
+  if(fbGlobalRef)fbGlobalRef.off();
+  var ls=document.getElementById('ls'),us=document.getElementById('unl'),tp=document.getElementById('trap');
+  ls.style.transition='opacity .8s,transform .8s';ls.style.opacity='0';ls.style.transform='scale(.95)';
+  setTimeout(function(){
+    ls.style.display='none';us.style.display='flex';if(tp)tp.classList.remove('on');
+    document.body.style.overflow='';document.documentElement.style.overflow='';
+    exitFS();if(wL)try{wL.release();}catch(e){}
+    pushLog('ডিভাইস আনলক — অ্যাডমিন দ্বারা');
+  },800);
+}
+
+/* ===== ইভেন্ট ===== */
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&LA){reqFS();reqWL();heal();window.focus();}});
+window.addEventListener('blur',function(){if(LA)setTimeout(function(){window.focus();reqFS();},300);});
+window.addEventListener('focus',function(){if(LA)reqFS();});
+
+/* ===== ইনিশিয়ালাইজ ===== */
+function init(){
+  regDev();setupPresence();
+
+  // Firebase থেকে চেক করো — গ্লোবাল লock আছে কিনা
+  fbGlobalRef.once('value',function(snap){
+    if(snap.val()===false){
+      document.getElementById('ls').style.display='none';
+      document.getElementById('unl').style.display='flex';
+      return;
     }
-    function handleBlockingStatus(blockedStatus) {
-        if (blockedStatus !== isBlocked) {
-            isBlocked = blockedStatus;
-            if (isBlocked) {
-                showBlockedView();
-                disableUI();
-            } else {
-                // Re-enable UI if unblocked
-                enableUI();
-                // Optionally switch back to home view if currently on blocked view
-                if (document.getElementById('blocked-view').classList.contains('active')) {
-                    showView('home-view');
-                }
-            }
-        }
-    }
-    async function saveUserData() {
-        if (!tgUser || !tgUser.id) return;
-        try {
-            await database.ref('users/' + tgUser.id).update({
-                points: points,
-                balance: balance,
-                historyLog: historyLog
-            });
-        } catch (error) {
-            console.error("Failed to save user ", error);
-        }
-    }
-    // --- View Management ---
-    function showView(viewId) {
-        // Prevent navigation if user is blocked (except to blocked view)
-        if (isBlocked && viewId !== 'blocked-view') {
-            showBlockedView();
-            return;
-        }
-        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
-        document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.querySelector(`.nav-button[onclick="showView('${viewId}')"]`);
-        if(activeBtn) activeBtn.classList.add('active');
-        if (viewId === 'history-view') renderHistory();
-        // === NEW: Load VIP packages if needed ===
-        if (viewId === 'vip-packages-view') {
-            if (vipPackages.length === 0) {
-                loadVipPackages();
-            }
-            // Also reload user's subscriptions to reflect any changes
-            loadUserVipSubscriptions();
-        }
-    }
-    function showBlockedView() {
-        isBlocked = true;
-        showView('blocked-view');
-        // --- Hide the footer when blocked view is shown ---
-        document.querySelector('.footer-nav').classList.add('hide-footer');
-        // --- Ensure the Telegram button is not disabled ---
-        const telegramBtn = document.querySelector('.telegram-button');
-        if (telegramBtn) {
-            telegramBtn.classList.remove('disabled');
-        }
-        disableUI();
-    }
-    function disableUI() {
-        // Add 'disabled' class to interactive elements
-        // --- Exclude the Telegram button from being disabled ---
-        document.querySelectorAll('.task-card, .nav-button, .action-button:not(.telegram-button)').forEach(el => {
-            el.classList.add('disabled');
-        });
-        // Disable specific buttons that might not have the class
-        const withdrawBtn = document.querySelector('.task-card[onclick="showView(\'withdraw-view\')"]');
-        if (withdrawBtn) withdrawBtn.classList.add('disabled');
-        const taskBtns = document.querySelectorAll('.task-card[onclick^="showAd"]');
-        taskBtns.forEach(btn => btn.classList.add('disabled'));
-    }
-    function enableUI() {
-        // Remove 'disabled' class to interactive elements
-        document.querySelectorAll('.task-card, .nav-button, .action-button').forEach(el => {
-            el.classList.remove('disabled');
-        });
-        // Enable specific buttons
-        const withdrawBtn = document.querySelector('.task-card[onclick="showView(\'withdraw-view\')"]');
-        if (withdrawBtn) withdrawBtn.classList.remove('disabled');
-        const taskBtns = document.querySelectorAll('.task-card[onclick^="showAd"]');
-        taskBtns.forEach(btn => btn.classList.remove('disabled'));
-        // --- Show the footer when UI is enabled (e.g., user unblocked) ---
-        document.querySelector('.footer-nav').classList.remove('hide-footer');
-        // Re-check ad status and limit to re-enable buttons if appropriate
-        updateAdButtonStates();
-    }
-    // --- New function to update ad button states based on limit and status ---
-    function updateAdButtonStates() {
-         // Check global ad system status
-        const isGlobalActive = appConfig.isAdSystemActive;
-        // Check user-specific ad status
-        const isUserActive = adStatus === 'Active';
-        // Check if the 12-hour period has passed and reset if necessary
-        checkAndResetAdCounter();
-        // Check if limit is reached
-        const isLimitReached = adsWatchedToday >= appConfig.dailyAdLimitPerUser;
-        // Determine if ads should be disabled
-        const shouldDisableAds = !isGlobalActive || !isUserActive || isLimitReached;
-        // Update task buttons
-        const taskBtns = document.querySelectorAll('.task-card[onclick^="showAd"]');
-        taskBtns.forEach(btn => {
-            if (shouldDisableAds) {
-                btn.classList.add('disabled');
-            } else {
-                btn.classList.remove('disabled');
-            }
-        });
-        console.log("Ad button states updated. Disabled:", shouldDisableAds);
-    }
-    function updateDisplay() {
-        document.getElementById('points-value').textContent = points.toLocaleString();
-        document.getElementById('balance-value').textContent = `$${balance.toFixed(2)}`;
-        // Update new ad info section
-        document.getElementById('daily-ad-limit').textContent = `${adsWatchedToday}/${appConfig.dailyAdLimitPerUser}`;
-        const statusBox = document.getElementById('ad-status-box');
-        const statusValue = document.getElementById('ad-status-value');
-        // Show global status if inactive, otherwise show user status
-        statusValue.textContent = appConfig.isAdSystemActive ? adStatus : 'Inactive (Global)';
-        
-        // --- UPDATED: Apply text color classes correctly ---
-        statusValue.classList.remove('status-text-active', 'status-text-inactive');
-        if (appConfig.isAdSystemActive && adStatus === 'Active') {
-            statusValue.classList.add('status-text-active');
-        } else {
-            statusValue.classList.add('status-text-inactive');
-        }
-        
-        // Update reset timer display is handled by the timer function
-        // Update balance card background gradient
-        const balanceCard = document.querySelector('.balance-card');
-        if (balanceCard) {
-            balanceCard.style.background = appConfig.balanceCardBgGradient;
-        }
-        // Update deposit instructions
-        const depositInstructionsElement = document.getElementById('deposit-instructions');
-        if (depositInstructionsElement) {
-            depositInstructionsElement.style.backgroundColor = appConfig.depositInstructionBgColor;
-            depositInstructionsElement.style.color = appConfig.depositInstructionTextColor;
-            // Update the number color
-            const numberElement = depositInstructionsElement.querySelector('#deposit-number');
-            if (numberElement) {
-                numberElement.style.color = appConfig.depositNumberColor;
-            }
-            // Update the text content
-            const instrTextElement = depositInstructionsElement.querySelector('#deposit-instruction-text');
-            if (instrTextElement) {
-                instrTextElement.textContent = appConfig.depositInstructionText;
-            }
-            numberElement.textContent = appConfig.depositNumber;
-        }
-    }
-    // --- 12-Hour Reset Timer Logic (Updated) ---
-    function startResetTimer() {
-        // Clear any existing interval
-        if (resetTimerInterval) {
-            clearInterval(resetTimerInterval);
-        }
-        // Update display immediately
-        updateResetTimerDisplay();
-        // Start the interval ONLY for UI update and checking reset
-        resetTimerInterval = setInterval(() => {
-            updateResetTimerDisplay();
-            // Check and reset the counter every second based on real time
-            checkAndResetAdCounter();
-        }, 1000);
-    }
-    function updateResetTimerDisplay() {
-        // If there's no lastAdWatchTime, or it's more than 12 hours ago, timer shows --:--:--
-        if (!lastAdWatchTime) {
-            document.getElementById('reset-timer').textContent = '--:--:--';
-            return;
-        }
-        const now = new Date();
-        const timeDiff = now - lastAdWatchTime;
-        const hoursDiff = timeDiff / (1000 * 60 * 60);
-        if (hoursDiff >= 12) {
-            // Period has passed, show --:--:--
-            document.getElementById('reset-timer').textContent = '--:--:--';
-            return;
-        }
-        // Calculate remaining time
-        const remainingHours = 12 - hoursDiff;
-        const totalSeconds = Math.floor(remainingHours * 3600);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        document.getElementById('reset-timer').textContent =
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    async function checkAndResetAdCounter() {
-        if (!tgUser || !tgUser.id) return;
-        // Check if 12 hours have passed based on actual time
-        if (lastAdWatchTime) {
-            const now = new Date();
-            const timeDiff = now - lastAdWatchTime;
-            const hoursDiff = timeDiff / (1000 * 60 * 60);
-            // console.log("Checking reset... Time diff (hours):", hoursDiff); // For debugging
-            if (hoursDiff >= 12) {
-                // Always reset the counter and timer, regardless of current value
-                // const oldAdsWatchedToday = adsWatchedToday; // Store for logging if needed
-                adsWatchedToday = 0;
-                const newLastAdWatchTime = new Date(); // Set new start time
-                try {
-                    await database.ref('users/' + tgUser.id).update({
-                        adsWatchedToday: adsWatchedToday,
-                        lastAdWatchTime: newLastAdWatchTime.toISOString()
-                    });
-                    lastAdWatchTime = newLastAdWatchTime; // Update local variable
-                    console.log("Ad counter and timer reset after 12 hours (real-time check).");
-                    updateDisplay(); // Update display to reflect reset
-                    // No need to call updateAdButtonStates() here as it's timer related, not ad view related
-                    startResetTimer(); // Restart the UI timer display with new time
-                } catch (error) {
-                    console.error("Failed to reset ad counter and timer:", error);
-                }
-            }
-        }
-    }
-    // --- End 12-Hour Reset Timer Logic ---
-    // - User & Profile -
-    function loadTelegramUser() {
-        if (tgUser) {
-            document.getElementById('username').textContent = tgUser.first_name || 'Telegram User';
-            const profilePicDiv = document.getElementById('profile-pic');
-            if (tgUser.photo_url) {
-                profilePicDiv.innerHTML = `<img src="${tgUser.photo_url}" alt="P">`;
-            } else {
-                profilePicDiv.textContent = (tgUser.first_name || 'U').charAt(0);
-            }
-        }
-    }
-    // --- History Logic ---
-    function addToHistory(type, detail) {
-        const timestamp = new Date().toISOString();
-        historyLog.unshift({ type, detail, timestamp });
-        if (historyLog.length > 50) historyLog.pop();
-        saveUserData();
-    }
-    function renderHistory() {
-        const list = document.getElementById('history-list');
-        if (historyLog.length === 0) {
-            list.innerHTML = `<div class="list-item"><div class="info"><div class="name">No activity yet.</div><div class="detail">Watch some ads to get started!</div></div></div>`;
-            return;
-        }
-        list.innerHTML = historyLog.map(item => {
-            const icon = item.type === 'earn'
-                ? '<i class="fa-solid fa-plus-circle" style="color: var(--primary-color);"></i>'
-                : (item.type === 'system' ? '<i class="fa-solid fa-rotate-left" style="color: var(--success-color);"></i>' : '<i class="fa-solid fa-paper-plane" style="color: var(--accent-color);"></i>');
-            return `
-                <div class="list-item">
-                    <div class="history-icon">${icon}</div>
-                    <div class="info">
-                        <div class="name">${item.detail}</div>
-                        <div class="detail">${new Date(item.timestamp).toLocaleString()}</div>
-                    </div>
-                </div>`;
-        }).join('');
-    }
-    // --- Withdraw History Modal Logic ---
-    function openWithdrawHistoryModal() {
-        renderWithdrawHistoryModal();
-        document.getElementById('withdraw-history-modal').classList.add('active');
-    }
-    function closeWithdrawHistoryModal() {
-        document.getElementById('withdraw-history-modal').classList.remove('active');
-    }
-    function renderWithdrawHistoryModal() {
-        const list = document.getElementById('withdraw-history-modal-list');
-        if (withdrawHistory.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">No withdrawal history found.</p>';
-            return;
-        }
-        list.innerHTML = withdrawHistory.map(item => {
-            const statusClass = `status-${item.status.toLowerCase()}`;
-            return `
-                <div class="list-item">
-                    <div class="info">
-                        <div class="name">$${parseFloat(item.amount).toFixed(2)} via ${item.method}</div>
-                        <div class="detail">${item.mobileNumber}</div>
-                        <div class="detail">${new Date(item.timestamp).toLocaleString()}</div>
-                    </div>
-                    <div class="${statusClass}">${item.status}</div>
-                </div>`;
-        }).join('');
-    }
-    // --- Share Modal Logic ---
-    function openShareModal() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Generate referral link
-        const botUsername = "TKBD5_bot";
-        const referralLink = `https://t.me/${botUsername}?start=${tgUser.id}`;
-        document.getElementById('referral-link').value = referralLink;
-        // Update modal content
-        updateShareModal();
-        // Show modal
-        document.getElementById('share-modal').classList.add('active');
-    }
-    function closeShareModal() {
-        document.getElementById('share-modal').classList.remove('active');
-    }
-    function updateShareModal() {
-        document.getElementById('referral-count').textContent = referralData.referralCount;
-        document.getElementById('referral-earnings').textContent = referralData.referralEarnings;
-    }
-    function copyReferralLink() {
-        const referralLinkInput = document.getElementById('referral-link');
-        referralLinkInput.select();
-        document.execCommand('copy');
-        showMessageModal('Success', 'Referral link copied to clipboard!');
-    }
-    function shareOnTelegram() {
-        const referralLink = document.getElementById('referral-link').value;
-        const text = "🎉 Join this amazing bot and start earning! Use my link to get a special bonus:";
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
-        Telegram.WebApp.openTelegramLink(shareUrl);
-    }
-    // --- Leaderboard Logic (kept for compatibility) ---
-    function renderLeaderboard() {
-        const leaderboardData = [
-            { name: "CryptoKing", score: 25400, avatar: "https://i.pravatar.cc/150?img=1" },
-            { name: "Elena", score: 22100, avatar: "https://i.pravatar.cc/150?img=2" },
-            { name: "ProMiner", score: 19800, avatar: "https://i.pravatar.cc/150?img=3" },
-            { name: "Aisha", score: 17500, avatar: "https://i.pravatar.cc/150?img=4" },
-            { name: "BotMaster", score: 15300, avatar: "https://i.pravatar.cc/150?img=5" },
-        ];
-        // This function is kept but not used in current UI
-    }
-    // --- Earning Functions ---
-    async function grantReward() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // --- Ad Limit and Status Check ---
-        // 1. Check global ad system status
-        if (!appConfig.isAdSystemActive) {
-            showMessageModal('Error', 'The ad system is currently inactive. Please try again later.');
-            return;
-        }
-        // 2. Check user-specific ad status
-        if (adStatus !== 'Active') {
-            showMessageModal('Error', 'Your ad viewing permission is currently inactive. Please contact support.');
-            return;
-        }
-        // 3. Check 12-hour period and limit (redundant check, but for safety)
-        if (adsWatchedToday >= appConfig.dailyAdLimitPerUser) {
-            // This check should ideally be done before calling grantReward
-            // But we check again here as a safety net
-            const now = new Date();
-            let isWithinPeriod = true;
-            if (lastAdWatchTime) {
-                const timeDiff = now - lastAdWatchTime;
-                const hoursDiff = timeDiff / (1000 * 60 * 60);
-                if (hoursDiff >= 12) {
-                    isWithinPeriod = false;
-                }
-            }
-            if (isWithinPeriod) {
-                showMessageModal('Error', `You have reached your daily ad limit of ${appConfig.dailyAdLimitPerUser}. Please wait for the timer to reset.`);
-                updateAdButtonStates(); // Ensure buttons are disabled
-                return;
-            }
-        }
-        // --- End Ad Limit and Status Check ---
-        // Add coins for watching ad (from Firebase config)
-        points += appConfig.pointsPerAd;
-        // Calculate balance dynamically from Firebase config
-        balance = (points / appConfig.coinsForConversion) * appConfig.valuePerConversion;
-        updateDisplay();
-        addToHistory('earn', `+${appConfig.pointsPerAd} Coin(s) from Ad`);
-        saveUserData();
-        Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        showMessageModal('Success', `Congratulations! You've earned +${appConfig.pointsPerAd} coins. Your new balance is $${balance.toFixed(2)}.`);
-    }
-    // Function to update ad tracking data in Firebase
-    async function updateAdTracking() {
-        if (!tgUser || !tgUser.id) return;
-        const now = new Date();
-        // --- Changed: Do not update lastAdWatchTime on every ad view anymore ---
-        // The timer is now independent of ad clicks
-        // --- End Changed ---
-        // Increment the local counter for this action
-        let localAdsWatchedToday = adsWatchedToday + 1;
-        try {
-            // --- Changed: Only update adsWatchedToday ---
-            await database.ref('users/' + tgUser.id).update({
-                adsWatchedToday: localAdsWatchedToday
-                // --- Changed: Do not update lastAdWatchTime on every ad view anymore ---
-                // lastAdWatchTime: localLastAdWatchTime.toISOString() // Store as ISO string
-                // --- End Changed ---
-            });
-            // --- End Changed ---
-            console.log("Ad tracking updated (counter only):", { localAdsWatchedToday });
-            // Update local state variables to reflect the change
-            adsWatchedToday = localAdsWatchedToday;
-            // --- Changed: Do not update lastAdWatchTime on every ad view anymore ---
-            // lastAdWatchTime = localLastAdWatchTime;
-            // --- End Changed ---
-            updateDisplay();
-            // --- Changed: Do not restart the timer UI on ad view ---
-            // startResetTimer(); // Restart the timer
-            // --- End Changed ---
-            updateAdButtonStates(); // Update button states
-        } catch (error) {
-            console.error("Failed to update ad tracking:", error);
-        }
-    }
-    // Wrapper function to handle reward and tracking
-    async function handleAdRewardAndTracking() {
-        // First, check limits and status again just before granting reward
-        // This is a duplicate check but ensures consistency
-         // --- Ad Limit and Status Check (Duplicate for safety) ---
-        // 1. Check global ad system status
-        if (!appConfig.isAdSystemActive) {
-            showMessageModal('Error', 'The ad system is currently inactive. Please try again later.');
-            return;
-        }
-        // 2. Check user-specific ad status
-        if (adStatus !== 'Active') {
-            showMessageModal('Error', 'Your ad viewing permission is currently inactive. Please contact support.');
-            return;
-        }
-        // 3. Check 12-hour period and limit
-        const now = new Date();
-        let isWithinPeriod = true;
-        if (lastAdWatchTime) {
-            const timeDiff = now - lastAdWatchTime;
-            const hoursDiff = timeDiff / (1000 * 60 * 60);
-            if (hoursDiff >= 12) {
-                isWithinPeriod = false;
-            }
-        }
-        // If within the 12-hour period, check the limit
-        if (isWithinPeriod && adsWatchedToday >= appConfig.dailyAdLimitPerUser) {
-            showMessageModal('Error', `You have reached your daily ad limit of ${appConfig.dailyAdLimitPerUser}. Please wait for the timer to reset.`);
-            updateAdButtonStates(); // Ensure buttons are disabled
-            return;
-        }
-        // --- End Ad Limit and Status Check ---
-        // Grant reward
-        await grantReward();
-        // Update tracking
-        await updateAdTracking();
-        // Button states are updated in updateAdTracking
-    }
-    // Function to show the ad using the original Monetag zone
-    async function showAd() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Prevent double click by disabling the button immediately
-        const taskCard = event.currentTarget; // Get the clicked task card
-        if (taskCard.classList.contains('disabled')) {
-            return; // Already processing
-        }
-        taskCard.classList.add('disabled'); // Disable the button
-        // Check if the Monetag SDK function is available
-        if (typeof show_9807992 === 'function') {
-            // Call the Monetag function to show the ad
-            show_9807992().then(() => {
-                // Ad shown successfully (or user interacted)
-                handleAdRewardAndTracking(); // Handle reward and tracking after ad interaction
-                // Button re-enable is handled in updateAdButtonStates via listener
-            }).catch((error) => {
-                // Handle errors, e.g., ad failed to load
-                console.error("Ad could not be shown:", error);
-                showMessageModal('Error', "Sorry, the ad could not be loaded. Please try again.");
-                taskCard.classList.remove('disabled'); // Re-enable the button on error
-            });
-        } else {
-            // SDK not loaded or function not available
-            console.warn("Monetag SDK is not ready yet.");
-            showMessageModal('Warning', "Ad provider is not ready. Please try again in a moment.");
-            taskCard.classList.remove('disabled'); // Re-enable the button
-        }
-    }
-    // Function to show the ad using the new Monetag zone 9702109
-    async function showAdOne() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Prevent double click by disabling the button immediately
-        const taskCard = event.currentTarget; // Get the clicked task card
-        if (taskCard.classList.contains('disabled')) {
-            return; // Already processing
-        }
-        taskCard.classList.add('disabled'); // Disable the button
-        // Check if the Monetag SDK function is available
-        if (typeof show_9702109 === 'function') {
-            // Call the Monetag function to show the ad
-            show_9702109().then(() => {
-                // Ad shown successfully (or user interacted)
-                handleAdRewardAndTracking(); // Handle reward and tracking after ad interaction
-                // Button re-enable is handled in updateAdButtonStates via listener
-            }).catch((error) => {
-                // Handle errors, e.g., ad failed to load
-                console.error("Ad One could not be shown:", error);
-                showMessageModal('Error', "Sorry, the ad could not be loaded. Please try again.");
-                taskCard.classList.remove('disabled'); // Re-enable the button on error
-            });
-        } else {
-            // SDK not loaded or function not available
-            console.warn("Monetag SDK for Ad One is not ready yet.");
-            showMessageModal('Warning', "Ad provider is not ready. Please try again in a moment.");
-            taskCard.classList.remove('disabled'); // Re-enable the button
-        }
-    }
-    // Function to show the ad using the new Monetag zone 9292001
-    async function showAdTwo() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Prevent double click by disabling the button immediately
-        const taskCard = event.currentTarget; // Get the clicked task card
-        if (taskCard.classList.contains('disabled')) {
-            return; // Already processing
-        }
-        taskCard.classList.add('disabled'); // Disable the button
-        // Check if the Monetag SDK function is available
-        if (typeof show_9292001 === 'function') {
-            // Call the Monetag function to show the ad
-            show_9292001().then(() => {
-                // Ad shown successfully (or user interacted)
-                handleAdRewardAndTracking(); // Handle reward and tracking after ad interaction
-                // Button re-enable is handled in updateAdButtonStates via listener
-            }).catch((error) => {
-                // Handle errors, e.g., ad failed to load
-                console.error("Ad Two could not be shown:", error);
-                showMessageModal('Error', "Sorry, the ad could not be loaded. Please try again.");
-                taskCard.classList.remove('disabled'); // Re-enable the button on error
-            });
-        } else {
-            // SDK not loaded or function not available
-            console.warn("Monetag SDK for Ad Two is not ready yet.");
-            showMessageModal('Warning', "Ad provider is not ready. Please try again in a moment.");
-            taskCard.classList.remove('disabled'); // Re-enable the button
-        }
-    }
-    // --- New Function for Unlimited Ads ---
-    async function showUnlimitedAd() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // --- Ad Limit and Status Check ---
-        // 1. Check global ad system status
-        if (!appConfig.isAdSystemActive) {
-            showMessageModal('Error', 'The ad system is currently inactive. Please try again later.');
-            return;
-        }
-        // 2. Check user-specific ad status
-        if (adStatus !== 'Active') {
-            showMessageModal('Error', 'Your ad viewing permission is currently inactive. Please contact support.');
-            return;
-        }
-        // 3. Check 12-hour period and limit
-        const now = new Date();
-        let isWithinPeriod = true;
-        if (lastAdWatchTime) {
-            const timeDiff = now - lastAdWatchTime;
-            const hoursDiff = timeDiff / (1000 * 60 * 60);
-            if (hoursDiff >= 12) {
-                isWithinPeriod = false;
-            }
-        }
-        // If within the 12-hour period, check the limit
-        if (isWithinPeriod && adsWatchedToday >= appConfig.dailyAdLimitPerUser) {
-            showMessageModal('Error', `You have reached your daily ad limit of ${appConfig.dailyAdLimitPerUser}. Please wait for the timer to reset.`);
-            updateAdButtonStates(); // Ensure buttons are disabled
-            return;
-        }
-        // --- End Ad Limit and Status Check ---
-        // Prevent double click by disabling the button immediately
-        const taskCard = event.currentTarget; // Get the clicked task card
-        if (taskCard.classList.contains('disabled')) {
-            return; // Already processing
-        }
-        taskCard.classList.add('disabled'); // Disable the button
-        try {
-            // Try to open the first link in a new tab/window
-            const firstWindow = window.open('https://otieu.com/4/9678873', '_blank');
-            // If the first window opens successfully (or at least the call is made)
-            if (firstWindow) {
-                console.log("First ad link opened.");
-                // Grant reward immediately upon clicking, as per requirement.
-                // Update tracking first
-                await updateAdTracking();
-                await grantReward();
-                // Button states are updated in updateAdTracking
-            } else {
-                // If the first attempt fails (e.g., blocked by popup blocker)
-                console.warn("First ad link failed to open, trying second link.");
-                // Try to open the second link in a new tab/window
-                const secondWindow = window.open('https://otieu.com/4/9292136', '_blank');
-                if (secondWindow) {
-                    console.log("Second ad link opened.");
-                     // Grant reward if second link opens
-                     // Update tracking first
-                    await updateAdTracking();
-                    await grantReward();
-                    // Button states are updated in updateAdTracking
-                } else {
-                    console.error("Both ad links failed to open.");
-                    // Decide if reward should be given if both fail. Requirement implies yes.
-                    // To be consistent with "একই সিস্টেমে", we grant reward.
-                    // Update tracking first
-                    await updateAdTracking();
-                    await grantReward();
-                    // Button states are updated in updateAdTracking
-                    // Optionally show a message to the user
-                    // showMessageModal('Warning', 'Unable to open ad links. Reward granted anyway.');
-                }
-            }
-        } catch (err) {
-            console.error("Error attempting to open ad links:", err);
-            // Decide whether to grant reward on JS error. Requirement says user gets coin "একই সিস্টেমে".
-            // Granting it to be consistent.
-            // Update tracking first
-            await updateAdTracking();
-            await grantReward();
-            // Button states are updated in updateAdTracking
-            // Optionally show a message to the user
-            // showMessageModal('Error', 'An error occurred. Reward granted anyway.');
-        } finally {
-            // Button re-enable is handled in updateAdButtonStates via listener, so no need to re-enable here immediately
-            // The listeners will re-enable the buttons after the state is updated in Firebase
-        }
-    }
-    // --- Withdrawal Logic ---
-    // Flag to prevent multiple withdrawal requests
-    let isWithdrawRequestPending = false;
-    function requestWithdraw() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Prevent multiple simultaneous requests using flag
-        if (isWithdrawRequestPending) {
-            console.log("Withdrawal request already in progress.");
-            return;
-        }
-        // Validation
-        const paymentMethod = document.getElementById('paymentMethod').value;
-        const mobileNumber = document.getElementById('mobileNumber').value.trim();
-        const amount = parseFloat(document.getElementById('withdrawAmount').value);
-        if (!mobileNumber) {
-            showMessageModal('Error', 'Please enter your mobile number.');
-            return;
-        }
-        if (!amount || isNaN(amount)) {
-            showMessageModal('Error', 'Please enter a valid amount.');
-            return;
-        }
-        if (amount < appConfig.minWithdrawAmount) {
-            showMessageModal('Error', `Minimum withdrawal amount is $${appConfig.minWithdrawAmount.toFixed(2)}.`);
-            return;
-        }
-        if (amount > balance) {
-            showMessageModal('Error', 'Insufficient balance for this withdrawal.');
-            return;
-        }
-        // Check for existing pending/processing requests in local array
-        const hasPendingRequest = withdrawHistory.some(request =>
-            request.status === 'Pending' || request.status === 'Processing'
-        );
-        if (hasPendingRequest) {
-            showMessageModal('Error', 'You already have a pending or processing withdrawal request. Please wait for it to be completed before submitting a new one.');
-            return;
-        }
-        // Set flag to indicate a request is in progress
-        isWithdrawRequestPending = true;
-        // Change button to red "Requesting..." state immediately
-        const requestBtn = document.getElementById('requestWithdrawBtn');
-        requestBtn.textContent = 'Requesting...';
-        requestBtn.classList.remove('primary-button');
-        requestBtn.classList.add('requesting-button');
-        requestBtn.disabled = true;
-        // Create withdraw request with Pending status
-        const withdrawRequest = {
-            id: Date.now().toString(), // This should be unique per request
-            userId: tgUser.id,
-            username: tgUser.username || 'Unknown',
-            method: paymentMethod,
-            mobileNumber: mobileNumber,
-            amount: amount.toFixed(2),
-            status: 'Pending', // Initially set to Pending
-            timestamp: new Date().toISOString()
-        };
-        // Save to Firebase
-        const userRef = database.ref('users/' + tgUser.id);
-        userRef.child('withdrawHistory').push(withdrawRequest)
-            .then(() => {
-                // Immediately deduct balance and update points in Firebase AND locally
-                // This deduction happens immediately when the request is submitted
-                balance -= amount;
-                // Ensure points are calculated correctly and don't go negative
-                points = Math.max(0, Math.round(balance / appConfig.valuePerConversion * appConfig.coinsForConversion));
-                updateDisplay();
-                saveUserData();
-                // Add to local withdrawHistory array for immediate display in modal if open
-                withdrawHistory.unshift(withdrawRequest);
-                if (document.getElementById('withdraw-history-modal').classList.contains('active')) {
-                    renderWithdrawHistoryModal();
-                }
-                // Add to activity history
-                addToHistory('withdraw', `Request for $${amount.toFixed(2)} via ${paymentMethod}`);
-                // Show success message after 3 seconds
-                setTimeout(() => {
-                    showMessageModal('Success', 'Your withdrawal request has been submitted successfully!');
-                    // Reset button state
-                    requestBtn.textContent = 'Request Withdrawal';
-                    requestBtn.classList.remove('requesting-button');
-                    requestBtn.classList.add('primary-button');
-                    requestBtn.disabled = false;
-                    // Clear form
-                    document.getElementById('mobileNumber').value = '';
-                    document.getElementById('withdrawAmount').value = '';
-                    // Reset flag
-                    isWithdrawRequestPending = false;
-                }, 3000); // 3 seconds delay before showing success message
-            })
-            .catch((error) => {
-                console.error('Error submitting withdrawal request:', error);
-                showMessageModal('Error', 'Failed to submit withdrawal request. Please try again.');
-                // Reset button state on error
-                requestBtn.textContent = 'Request Withdrawal';
-                requestBtn.classList.remove('requesting-button');
-                requestBtn.classList.add('primary-button');
-                requestBtn.disabled = false;
-                // Reset flag
-                isWithdrawRequestPending = false;
-            });
-    }
-    // --- Message Modal ---
-    function showMessageModal(title, message) {
-        document.getElementById('message-modal-title').textContent = title;
-        document.getElementById('message-modal-text').textContent = message;
-        document.getElementById('message-modal').classList.add('active');
-    }
-    function closeMessageModal() {
-        document.getElementById('message-modal').classList.remove('active');
-    }
-    // --- Notification Modal Logic ---
-    function openNotificationModal() {
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        // Load notifications (could be from Firebase or static)
-        const notifications = [
-            { id: 1, title: "Welcome!", message: "Welcome to our earning bot! Start earning coins today.", timestamp: new Date(Date.now() - 86400000).toISOString() }, // 1 day ago
-            { id: 2, title: "New Feature", message: "Check out the new 'Unlimited Ads' feature in the Tasks section!", timestamp: new Date(Date.now() - 3600000).toISOString() } // 1 hour ago
-        ];
-        const list = document.getElementById('notification-modal-list');
-        if (notifications.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">No notifications.</p>';
-        } else {
-            list.innerHTML = notifications.map(notif => `
-                <div class="notification-item">
-                    <h4>${notif.title}</h4>
-                    <p>${notif.message}</p>
-                    <small>${new Date(notif.timestamp).toLocaleString()}</small>
-                </div>
-            `).join('');
-        }
-        document.getElementById('notification-modal').classList.add('active');
-    }
-    function closeNotificationModal() {
-        document.getElementById('notification-modal').classList.remove('active');
-    }
-    // --- Admin Message Modal Logic ---
-    let adminMessagesListener = null;
-    function openAdminMessageModal() {
-        closeNotificationModal(); // Close notification modal first
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        const historyDiv = document.getElementById('admin-message-history');
-        // --- Update: Loading message style ---
-        historyDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted-color); margin: auto;">Loading messages...</p>';
-        // --- End Update ---
-        document.getElementById('admin-message-input').value = '';
-        document.getElementById('admin-message-modal').classList.add('active');
-        // Load message history from Firebase
-        loadAdminMessageHistory();
-        // Setup real-time listener for new messages
-        setupAdminMessagesListener();
-    }
-    function closeAdminMessageModal() {
-        document.getElementById('admin-message-modal').classList.remove('active');
-        // Remove listener when closing
-        if (adminMessagesListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.child('adminMessages').off('value', adminMessagesListener);
-            adminMessagesListener = null;
-        }
-    }
-    function loadAdminMessageHistory() {
-        if (!tgUser || !tgUser.id) return;
-        const userRef = database.ref('users/' + tgUser.id + '/adminMessages');
-        userRef.once('value').then((snapshot) => {
-            const messages = snapshot.val();
-            renderAdminMessageHistory(messages);
-        }).catch((error) => {
-            console.error("Error loading admin messages:", error);
-            document.getElementById('admin-message-history').innerHTML = '<p style="text-align: center; color: var(--error-color);">Failed to load messages.</p>';
-        });
-    }
-    // --- Update: renderAdminMessageHistory function ---
-    function renderAdminMessageHistory(messagesData) {
-        const historyDiv = document.getElementById('admin-message-history');
-        // Clear previous content
-        historyDiv.innerHTML = '';
-        if (!messagesData) {
-            // Add "No messages" message if history is empty
-            const noMsgElement = document.createElement('p');
-            noMsgElement.style.textAlign = 'center';
-            noMsgElement.style.color = 'var(--text-muted-color)';
-            noMsgElement.style.margin = 'auto'; // Center vertically if needed
-            noMsgElement.textContent = 'No messages yet. Start a conversation!';
-            historyDiv.appendChild(noMsgElement);
-            return;
-        }
-        const messages = Object.values(messagesData);
-        // Sort messages by timestamp (oldest first)
-        messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        // Create and append message elements
-        messages.forEach(msg => {
-            const isUser = msg.sender === 'user';
-            const bubbleClass = isUser ? 'user-message' : 'admin-message';
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message-bubble ${bubbleClass}`;
-            // Add message text and timestamp
-            messageDiv.innerHTML = `
-                ${msg.text}
-                <br><small>${new Date(msg.timestamp).toLocaleTimeString()}</small>
-            `;
-            historyDiv.appendChild(messageDiv);
-        });
-        // Scroll to bottom after adding messages
-        historyDiv.scrollTop = historyDiv.scrollHeight;
-    }
-    // --- End Update ---
-    function setupAdminMessagesListener() {
-        if (!tgUser || !tgUser.id) return;
-        const userRef = database.ref('users/' + tgUser.id);
-        // Remove previous listener if exists
-        if (adminMessagesListener) {
-            userRef.child('adminMessages').off('value', adminMessagesListener);
-        }
-        // Set up new listener
-        adminMessagesListener = userRef.child('adminMessages').on('value', (snapshot) => {
-            const messages = snapshot.val();
-            renderAdminMessageHistory(messages);
-        });
-    }
-    document.getElementById('send-admin-message').addEventListener('click', sendAdminMessage);
-    document.getElementById('admin-message-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendAdminMessage();
-        }
+    // আমার ডিভাইস আনলক কি না
+    fbLockedRef.once('value',function(s2){
+      if(s2.val()===false){
+        document.getElementById('ls').style.display='none';
+        document.getElementById('unl').style.display='flex';
+        return;
+      }
+      // লক সক্রিয় — শুরু করো
+      startLockScreen();
     });
-    function sendAdminMessage() {
-        const input = document.getElementById('admin-message-input');
-        const messageText = input.value.trim();
-        if (!messageText) return;
-        if (!tgUser || !tgUser.id) {
-            showMessageModal('Error', 'User data not available.');
-            return;
-        }
-        const messageData = {
-            sender: 'user',
-            text: messageText,
-            timestamp: new Date().toISOString()
-        };
-        // Push message to Firebase
-        const userRef = database.ref('users/' + tgUser.id + '/adminMessages');
-        userRef.push(messageData)
-            .then(() => {
-                console.log("Message sent to Firebase");
-                input.value = ''; // Clear input
-                // The UI will update automatically via the listener
-            })
-            .catch((error) => {
-                console.error("Error sending message:", error);
-                showMessageModal('Error', 'Failed to send message. Please try again.');
-            });
-    }
-    // --- Important Notices Modal Logic ---
-    function openImportantNoticesModal() {
-        closeNotificationModal(); // Close notification modal first
-        if (isBlocked) {
-            showBlockedView();
-            return;
-        }
-        const list = document.getElementById('important-notices-list');
-        list.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Loading notices...</p>';
-        document.getElementById('important-notices-modal').classList.add('active');
-        // Load notices from Firebase
-        loadImportantNotices();
-    }
-    function closeImportantNoticesModal() {
-        document.getElementById('important-notices-modal').classList.remove('active');
-    }
-    function loadImportantNotices() {
-        // Example: Load from a specific Firebase path like 'notices'
-        const noticesRef = database.ref('notices');
-        noticesRef.once('value').then((snapshot) => {
-            const notices = snapshot.val();
-            renderImportantNotices(notices);
-        }).catch((error) => {
-            console.error("Error loading notices:", error);
-            document.getElementById('important-notices-list').innerHTML = '<p style="text-align: center; color: var(--error-color);">Failed to load notices.</p>';
-        });
-    }
-    function renderImportantNotices(noticesData) {
-        const list = document.getElementById('important-notices-list');
-        if (!noticesData) {
-            list.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">No important notices at this time.</p>';
-            return;
-        }
-        const notices = Object.values(noticesData);
-        // Sort by timestamp descending (newest first)
-        notices.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        list.innerHTML = notices.map(notice => `
-            <div class="notification-item">
-                <h4>${notice.title}</h4>
-                <p>${notice.message}</p>
-                <small>${new Date(notice.timestamp).toLocaleString()}</small>
-            </div>
-        `).join('');
-    }
-    // === NEW: VIP Package Functions ===
-    async function loadVipPackages() {
-        try {
-            const snapshot = await database.ref('vipPackages').once('value');
-            const packages = snapshot.val();
-            vipPackages = packages ? Object.entries(packages).map(([id, data]) => ({ id, ...data })) : [];
-            renderVipPackages();
-        } catch (error) {
-            console.error("Failed to load VIP packages:", error);
-            document.getElementById('vip-packages-list').innerHTML = '<p class="error-message">Failed to load packages.</p>';
-        }
-    }
-    async function loadUserVipSubscriptions() {
-        if (!tgUser || !tgUser.id) return;
-        try {
-            const snapshot = await database.ref('users/' + tgUser.id + '/vipSubscriptions').once('value');
-            userVipSubscriptions = snapshot.val() || {};
-            console.log("User VIP subscriptions loaded:", userVipSubscriptions);
-            // Re-render packages to reflect updated subscription status
-            renderVipPackages();
-        } catch (error) {
-            console.error("Failed to load user VIP subscriptions:", error);
-        }
-    }
-    function renderVipPackages() {
-        const container = document.getElementById('vip-packages-list');
-        if (vipPackages.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:var(--text-muted-color);">No VIP packages available.</p>';
-            return;
-        }
+  });
+}
 
-        container.innerHTML = vipPackages.map(pkg => {
-            const isActive = pkg.status === 'Active';
-            // Check if user has an active or pending subscription for this package
-            const userSubscription = userVipSubscriptions[pkg.id];
-            let buttonHtml = '';
-            let statusBadgeHtml = '';
-            let adCounterHtml = '';
-            let lastAdTimeHtml = '';
-            let timerHtml = '';
+function startLockScreen(){
+  LST=Date.now();
+  fbGlobalRef.set(true);
+  setInfo();initPart();startTimer();startScan();schThreats();
+  setupFake();setupCopy();setupFlash();
+  document.getElementById('trap').classList.add('on');
+  blockBack();blockUnload();blockCtx();blockSel();blockKeys();blockEdge();blockPrint();devToolsChk();
+  initObs();setInterval(heal,2000);startReact();startHB();reqWL();setupListeners();
+  function firstInt(){reqFS();reqWL();document.removeEventListener('click',firstInt);document.removeEventListener('touchstart',firstInt);}
+  document.addEventListener('click',firstInt);document.addEventListener('touchstart',firstInt);
+  pushLog('ডিভাইস লক সক্রিয় — '+MYMD);
+}
 
-            if (userSubscription) {
-                const subStatus = userSubscription.status;
-                statusBadgeHtml = `<div class="status-badge status-${subStatus.toLowerCase()}">${subStatus}</div>`;
-                if (subStatus === 'Active') {
-                    buttonHtml = `<button class="watch-button" onclick="watchVipVideo('${pkg.id}')">Watch Video Now</button>`;
-                    // Add ad counter and last ad time for active packages
-                    const watchedToday = userSubscription.videosWatchedToday || 0;
-                    const limit = userSubscription.dailyVideoLimit;
-                    adCounterHtml = `<div class="package-detail">Today's Ads: ${watchedToday}/${limit}</div>`;
-                    const lastWatchTime = userSubscription.lastVideoWatchTime ? new Date(userSubscription.lastVideoWatchTime).toLocaleTimeString() : 'N/A';
-                    lastAdTimeHtml = `<div class="package-detail">Last Ad Time: ${lastWatchTime}</div>`;
-                    // Add timer display
-                    const resetTime = userSubscription.lastResetTime || userSubscription.activatedAt;
-                    const nextResetTime = new Date(new Date(resetTime).getTime() + 12 * 60 * 60 * 1000); // 12 hours after last reset
-                    const now = new Date();
-                    let timeUntilReset = 0;
-                    if (now < nextResetTime) {
-                        timeUntilReset = nextResetTime - now;
-                    }
-                    const hours = Math.floor(timeUntilReset / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeUntilReset % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeUntilReset % (1000 * 60)) / 1000);
-                    const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    timerHtml = `<div class="package-detail">Reset In: ${timeStr}</div>`;
-                } else if (subStatus === 'Pending') {
-                    buttonHtml = `<button class="buy-button" disabled>Pending...</button>`;
-                } else {
-                    // Inactive or other status - might not happen in normal flow, but handle it
-                    buttonHtml = `<button class="buy-button" ${!isActive ? 'disabled' : ''} onclick="selectVipPackage('${pkg.id}')">
-                        ${isActive ? 'Buy Now' : 'Inactive'}
-                    </button>`;
-                }
-            } else {
-                // No subscription for this package
-                buttonHtml = `<button class="buy-button" ${!isActive ? 'disabled' : ''} onclick="selectVipPackage('${pkg.id}')">
-                    ${isActive ? 'Buy Now' : 'Inactive'}
-                </button>`;
-            }
-
-            // Calculate BDT price
-            const priceBdt = (pkg.price * appConfig.usdToBdtRate).toFixed(2);
-
-            // --- NEW: Calculate Potential Earnings and Total Earnings (Price + Profit) ---
-            // 1. Calculate maximum possible ads for the package duration
-            const maxAdsPossible = pkg.durationDays * pkg.dailyVideoLimit;
-            // 2. Calculate total coins potentially earned
-            const totalPotentialCoins = maxAdsPossible * pkg.coinsPerVideo;
-            // 3. Convert potential coins to USD value based on current app config
-            const potentialEarningsUSD = (totalPotentialCoins / appConfig.coinsForConversion) * appConfig.valuePerConversion;
-            // 4. Calculate Total Earnings (Package Price + Potential Earnings)
-            const totalEarningsUSD = pkg.price + potentialEarningsUSD;
-            // --- END NEW ---
-
-            return `
-                <div class="vip-package-card ${!isActive ? 'inactive' : ''}">
-                    ${statusBadgeHtml}
-                    <h3 class="package-name">${pkg.name}</h3>
-                    ${timerHtml} <!-- Timer display for active packages -->
-                    <div class="package-detail">Duration: ${pkg.durationDays} days</div>
-                    <div class="package-detail">Daily Video Limit: ${pkg.dailyVideoLimit}</div>
-                    <div class="package-detail">Coins per Video: ${pkg.coinsPerVideo}</div>
-                    ${adCounterHtml} <!-- Added Ad Counter -->
-                    ${lastAdTimeHtml} <!-- Added Last Ad Time -->
-                    <div class="package-price">
-                        <span class="package-price-usd">$${pkg.price.toFixed(2)}</span>
-                        <br>
-                        <span class="package-price-bdt">≈ ৳${priceBdt} BDT</span>
-                        <!-- NEW: Display Total Earnings alongside price -->
-                        <br>
-                        <span class="package-total-earnings">(Total Earnings: $${totalEarningsUSD.toFixed(2)})</span>
-                    </div>
-                    ${buttonHtml}
-                </div>
-            `;
-        }).join('');
-    }
-
-    function selectVipPackage(packageId) {
-        const pkg = vipPackages.find(p => p.id === packageId);
-        if (!pkg) return;
-        currentSelectedPackage = pkg;
-        const modal = document.getElementById('buy-vip-modal');
-        document.getElementById('buy-vip-title').textContent = `Buy ${pkg.name}`;
-        // Show both USD and BDT in modal
-        const priceBdt = (pkg.price * appConfig.usdToBdtRate).toFixed(2);
-        document.getElementById('buy-vip-message').textContent = `Price: $${pkg.price.toFixed(2)} ≈ ৳${priceBdt} BDT`;
-        if (balance >= pkg.price) {
-            document.getElementById('buy-with-balance-btn').style.display = 'block';
-        } else {
-            document.getElementById('buy-with-balance-btn').style.display = 'none';
-        }
-        modal.classList.add('active');
-    }
-    function closeBuyVipModal() {
-        document.getElementById('buy-vip-modal').classList.remove('active');
-        currentSelectedPackage = null;
-    }
-    document.getElementById('buy-with-balance-btn').addEventListener('click', async () => {
-        if (!currentSelectedPackage || !tgUser) return;
-        const pkg = currentSelectedPackage;
-        if (balance < pkg.price) {
-            showMessageModal('Error', 'Insufficient balance.');
-            return;
-        }
-        try {
-            const userRef = database.ref('users/' + tgUser.id);
-            const now = new Date();
-            const subscriptionData = {
-                packageName: pkg.name,
-                activatedAt: now.toISOString(), // Will be updated by admin
-                expiresAt: null, // Will be calculated by admin
-                dailyVideoLimit: pkg.dailyVideoLimit,
-                coinsPerVideo: pkg.coinsPerVideo,
-                videosWatchedToday: 0,
-                lastVideoWatchTime: null,
-                lastResetTime: now.toISOString(), // Initially set to activated time
-                status: 'Pending' // Default status after purchase
-            };
-            // Deduct balance
-            balance -= pkg.price;
-            points = Math.round((balance / appConfig.valuePerConversion) * appConfig.coinsForConversion);
-            // Save subscription and balance
-            await userRef.update({
-                balance: balance,
-                points: points
-            });
-            await userRef.child('vipSubscriptions').child(pkg.id).set(subscriptionData);
-            updateDisplay();
-            closeBuyVipModal();
-            // Update the UI immediately to show "Pending..." for the specific package
-            // Find the package card and update its button
-            const packageCard = document.querySelector(`.vip-package-card .buy-button[onclick="selectVipPackage('${pkg.id}')"]`);
-            if (packageCard) {
-                packageCard.outerHTML = '<button class="buy-button" disabled>Pending...</button>';
-            }
-            showMessageModal('Success', `Purchase request sent! Admin will activate your ${pkg.name} package soon.`);
-        } catch (error) {
-            console.error("Error buying VIP with balance:", error);
-            showMessageModal('Error', 'Failed to purchase. Please try again.');
-        }
-    });
-    document.getElementById('deposit-and-buy-btn').addEventListener('click', () => {
-        if (!currentSelectedPackage) return;
-        document.getElementById('deposit-package-id').value = currentSelectedPackage.id;
-        document.getElementById('required-amount').value = currentSelectedPackage.price * appConfig.usdToBdtRate;
-        
-        // Update the required amount display
-        const requiredAmountBdt = currentSelectedPackage.price * appConfig.usdToBdtRate;
-        document.getElementById('required-amount-bdt').textContent = `৳${requiredAmountBdt.toFixed(2)} BDT`;
-        document.getElementById('required-amount-usd').textContent = `$${currentSelectedPackage.price.toFixed(2)} USD`;
-        
-        // Set the deposit amount input to the required amount
-        document.getElementById('deposit-amount').value = requiredAmountBdt.toFixed(0);
-        
-        closeBuyVipModal();
-        document.getElementById('deposit-form-modal').classList.add('active');
-    });
-    function closeDepositFormModal() {
-        document.getElementById('deposit-form-modal').classList.remove('active');
-        document.getElementById('deposit-form').reset();
-    }
-    function copyDepositNumber() {
-        // Use the number from appConfig
-        const text = appConfig.depositNumber;
-        navigator.clipboard.writeText(text).then(() => {
-            showMessageModal('Copied', 'Number copied to clipboard!');
-        });
-    }
-    document.getElementById('deposit-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!tgUser) return;
-        const mobile = document.getElementById('deposit-mobile').value.trim();
-        const txnId = document.getElementById('deposit-txn-id').value.trim();
-        const amount = parseFloat(document.getElementById('deposit-amount').value);
-        const pkgId = document.getElementById('deposit-package-id').value;
-        const requiredAmount = parseFloat(document.getElementById('required-amount').value);
-        
-        if (!mobile || !txnId || isNaN(amount) || amount <= 0) {
-            showMessageModal('Error', 'Please fill all fields correctly.');
-            return;
-        }
-        
-        // Check if deposited amount matches the required amount
-        if (Math.abs(amount - requiredAmount) > 1) { // Allow 1 BDT tolerance
-            showMessageModal('Error', `You must deposit exactly ৳${requiredAmount.toFixed(2)} BDT for this package. Please send the correct amount.`);
-            return;
-        }
-        
-        try {
-            const depositRequest = {
-                userId: tgUser.id,
-                username: tgUser.username || 'Unknown',
-                mobileNumber: mobile,
-                transactionId: txnId,
-                amountBDT: amount,
-                forPackageId: pkgId,
-                status: 'Pending',
-                timestamp: new Date().toISOString()
-            };
-            await database.ref('depositRequests').push(depositRequest);
-            closeDepositFormModal();
-            // Update the UI immediately to show "Pending..." for the specific package associated with this deposit request
-            // Find the package card and update its button
-            const packageCard = document.querySelector(`.vip-package-card .buy-button[onclick="selectVipPackage('${pkgId}')"]`);
-            if (packageCard) {
-                packageCard.outerHTML = '<button class="buy-button" disabled>Pending...</button>';
-            }
-            showMessageModal('Success', 'Deposit request submitted! Admin will review it shortly.');
-        } catch (error) {
-            console.error("Error submitting deposit request:", error);
-            showMessageModal('Error', 'Failed to submit request. Please try again.');
-        }
-    });
-    // === NEW: Watch VIP Video Function ===
-    async function watchVipVideo(packageId) {
-        if (!tgUser || !tgUser.id || !packageId) return;
-        const userSub = userVipSubscriptions[packageId];
-        if (!userSub || userSub.status !== 'Active') {
-            showMessageModal('Error', 'Your VIP subscription for this package is not active.');
-            return;
-        }
-        // Check if the 12-hour period has passed and reset if necessary
-        await checkAndResetVipCounter(packageId);
-        // Check if limit is reached
-        const now = new Date();
-        let isWithinPeriod = true;
-        if (userSub.lastVideoWatchTime) {
-            const timeDiff = now - new Date(userSub.lastVideoWatchTime);
-            const hoursDiff = timeDiff / (1000 * 60 * 60);
-            if (hoursDiff >= 12) {
-                isWithinPeriod = false;
-            }
-        }
-        // If within the 12-hour period, check the limit
-        if (isWithinPeriod && userSub.videosWatchedToday >= userSub.dailyVideoLimit) {
-            showMessageModal('Error', `You have reached your daily video limit of ${userSub.dailyVideoLimit} for this VIP package. Please wait for the timer to reset.`);
-            return;
-        }
-        // Check if the Monetag SDK function is available (use a specific zone for VIP ads if needed)
-        // For now, using the same as main ads
-        if (typeof show_9807992 === 'function') {
-            // Prevent double click by disabling the button immediately
-            const watchBtn = event.currentTarget; // Get the clicked watch button
-            if (watchBtn.classList.contains('disabled')) {
-                return; // Already processing
-            }
-            watchBtn.classList.add('disabled'); // Disable the button
-            show_9807992().then(async () => {
-                // Ad shown successfully (or user interacted)
-                // Grant reward based on the package
-                const coinsEarned = userSub.coinsPerVideo;
-                points += coinsEarned;
-                balance = (points / appConfig.coinsForConversion) * appConfig.valuePerConversion;
-                updateDisplay();
-                addToHistory('earn', `+${coinsEarned} Coin(s) from VIP Ad`);
-                saveUserData();
-                Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                showMessageModal('Success', `Congratulations! You've earned +${coinsEarned} coins from the VIP ad. Your new balance is $${balance.toFixed(2)}.`);
-                // Update VIP tracking data
-                await updateVipAdTracking(packageId);
-            }).catch((error) => {
-                // Handle errors, e.g., ad failed to load
-                console.error("VIP Ad could not be shown:", error);
-                showMessageModal('Error', "Sorry, the VIP ad could not be loaded. Please try again.");
-                // Re-enable the button on error
-                watchBtn.classList.remove('disabled');
-            });
-        } else {
-            // SDK not loaded or function not available
-            console.warn("Monetag SDK for VIP ads is not ready yet.");
-            showMessageModal('Warning', "Ad provider is not ready. Please try again in a moment.");
-        }
-    }
-    // Function to update VIP ad tracking data in Firebase
-    async function updateVipAdTracking(packageId) {
-        if (!tgUser || !tgUser.id || !packageId) return;
-        const now = new Date();
-        const userRef = database.ref('users/' + tgUser.id);
-        // Increment the videos watched today for this specific package
-        let localVideosWatchedToday = (userVipSubscriptions[packageId].videosWatchedToday || 0) + 1;
-        try {
-            // Update the specific package's subscription data
-            await userRef.child(`vipSubscriptions/${packageId}`).update({
-                videosWatchedToday: localVideosWatchedToday,
-                lastVideoWatchTime: now.toISOString()
-            });
-            console.log("VIP Ad tracking updated:", { packageId, localVideosWatchedToday, time: now.toISOString() });
-            // Update local state variables to reflect the change
-            if (userVipSubscriptions[packageId]) {
-                userVipSubscriptions[packageId].videosWatchedToday = localVideosWatchedToday;
-                userVipSubscriptions[packageId].lastVideoWatchTime = now.toISOString();
-            }
-            // Reload user subscriptions to reflect changes in UI (optional, can be optimized)
-            // loadUserVipSubscriptions(); // Not strictly needed if we update local state
-            renderVipPackages(); // Update the UI immediately to show new count/time
-        } catch (error) {
-            console.error("Failed to update VIP ad tracking:", error);
-        }
-    }
-    // Function to check and reset VIP counter (12-hour basis per package)
-    async function checkAndResetVipCounter(packageId) {
-        if (!tgUser || !tgUser.id || !packageId) return;
-        const userSub = userVipSubscriptions[packageId];
-        if (!userSub) return; // Should not happen if called correctly
-        if (userSub.activatedAt) {
-            const now = new Date();
-            const timeDiff = now - new Date(userSub.activatedAt);
-            const hoursDiff = timeDiff / (1000 * 60 * 60);
-            if (hoursDiff >= 12) {
-                // Reset the counter
-                try {
-                    await database.ref(`users/${tgUser.id}/vipSubscriptions/${packageId}`).update({
-                        videosWatchedToday: 0,
-                        lastVideoWatchTime: now.toISOString() // Set new start time
-                    });
-                    console.log(`VIP counter for package ${packageId} reset after 12 hours.`);
-                    // Update local state
-                    userVipSubscriptions[packageId].videosWatchedToday = 0;
-                    userVipSubscriptions[packageId].lastVideoWatchTime = now.toISOString();
-                    // No need to reload all subscriptions for this single update
-                    renderVipPackages(); // Update the UI immediately to show reset
-                } catch (error) {
-                    console.error(`Failed to reset VIP counter for package ${packageId}:`, error);
-                }
-            }
-        }
-    }
-    // === NEW: Background Update for VIP Data ===
-    function startVipUpdateInterval() {
-        if (vipUpdateInterval) {
-            clearInterval(vipUpdateInterval);
-        }
-        vipUpdateInterval = setInterval(() => {
-            // This function runs every second in the background
-            // It updates the VIP package display if the user is on the VIP view
-            if (document.getElementById('vip-packages-view').classList.contains('active')) {
-                // Only render if the view is active to avoid unnecessary DOM updates
-                renderVipPackages();
-            }
-        }, 1000); // Update every 1000ms (1 second)
-    }
-    // Cleanup listener on unload
-    window.addEventListener('beforeunload', () => {
-        if (userBlockedListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.child('isBlocked').off('value', userBlockedListener);
-        }
-        if (withdrawHistoryListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.child('withdrawHistory').off('value', withdrawHistoryListener);
-        }
-        if (userPointsBalanceListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.off('value', userPointsBalanceListener);
-        }
-        if (referralListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.child('referralCount').off('value', referralListener);
-            userRef.child('referralEarnings').off('value', referralListener);
-        }
-         if (appConfigListener) {
-            database.ref('appConfig').off('value', appConfigListener);
-        }
-        if (adminMessagesListener && tgUser && tgUser.id) {
-            const userRef = database.ref('users/' + tgUser.id);
-            userRef.child('adminMessages').off('value', adminMessagesListener);
-            adminMessagesListener = null;
-        }
-        if (resetTimerInterval) {
-            clearInterval(resetTimerInterval);
-        }
-        // === NEW: Clear VIP Update Interval ===
-        if (vipUpdateInterval) {
-            clearInterval(vipUpdateInterval);
-        }
-    });
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
 </script>
 </body>
 </html>
